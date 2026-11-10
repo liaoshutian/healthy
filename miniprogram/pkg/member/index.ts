@@ -1,7 +1,7 @@
 import { get, post, showError } from '../../utils/api'
 
 const TIER_NAME: Record<string, string> = { free: '免费版', pro: 'Pro', max: 'Max' }
-const FEATURE: Record<string, string> = { food: '拍食物', inbody: '拍体测报告', medicine: '拍药盒' }
+const FEATURE: Record<string, string> = { food: '拍食物', inbody: '拍体测报告', medicine: '拍药盒', text: '文字记餐', interpret: 'AI 解读' }
 
 Page({
   data: { d: { benefits: {} } as any, tierName: '', quotas: [] as any[], code: '', redeeming: false, highlight: '' },

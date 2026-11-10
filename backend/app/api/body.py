@@ -145,13 +145,17 @@ def detail(rid: int, user: User = Depends(current_user), db: Session = Depends(g
 @router.post("/{rid}/interpret")
 def interpret(rid: int, user: User = Depends(current_user), db: Session = Depends(get_db)):
     """AI 文字解读，Pro 及以上。"""
-    if tier_of(db, user) == "free":
+    tier, today = tier_of(db, user), clock.today()
+    if not quota.allowed("interpret", tier):
         raise HTTPException(402, "AI 解读是 Pro 权益")
     r = own(db, BodyRecord, rid, user)
+    if not quota.try_consume("interpret", user.id, tier, today):
+        raise HTTPException(429, "今天的解读次数用完啦，明天再来看看")
     prev = latest(db, user, before=r.measured_at)
     pick = lambda x: {k: getattr(x, k) for k in NUM_FIELDS if getattr(x, k) is not None}  # noqa: E731
     result = interpret_body(db, user.id, {"性别": user.gender, **pick(r)}, pick(prev) if prev else None)
     if not result:
+        quota.refund("interpret", user.id, today)
         raise HTTPException(503, "解读暂时生成不了，等会儿再试")
     return {**result, "ai_generated": True}
 

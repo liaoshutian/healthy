@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from app.services import clock
+from app.services import clock, quota
 from app.services.ai.client import AIError
 from tests.conftest import jpeg_bytes, login
 
@@ -285,3 +285,38 @@ def test_openai_only_via_relay(monkeypatch):
     assert vision_providers()[0].base_url == "https://relay.test/v1"
     monkeypatch.setattr(get_settings(), "openai_base_url", "")
     assert [p.name for p in vision_providers()] == ["qwen"]
+
+
+def test_every_ai_endpoint_checks_tier_and_quota(client, auth, fake_ai):
+    """所有调用大模型的接口都在后台过鉴权 + 等级 + 配额。"""
+    responses, calls = fake_ai
+    responses["deepseek"] = {"items": [{"name": "牛肉面", "grams": 500, "count": 1, "unit": "碗"}]}
+    responses["openai"] = INBODY_AI
+    # 没登录一律 401
+    assert client.post("/api/meals/parse-text", json={"text": "一碗牛肉面"}).status_code == 401
+    # Pro（试用）可以解读，有每日上限
+    client.post("/api/me/consent", headers=auth, json={"kind": "health"})
+    rid = client.post("/api/body", headers=auth, json={"weight_kg": 70, "source": "weight"}).json()["id"]
+    responses["deepseek"] = {"summary": "保持得不错", "next_steps": ["多走走"]}
+    for _ in range(quota.limit_for("interpret", "pro")):
+        assert client.post(f"/api/body/{rid}/interpret", headers=auth).status_code == 200
+    n = len(calls)
+    assert client.post(f"/api/body/{rid}/interpret", headers=auth).status_code == 429
+    assert len(calls) == n  # 超额不会再打到模型
+    # Free：没有 AI 解读，文字记餐每天 10 次
+    downgrade_to_free(client, auth)
+    assert client.post(f"/api/body/{rid}/interpret", headers=auth).status_code == 402
+    assert "interpret" not in [q["feature"] for q in client.get("/api/me", headers=auth).json()["quotas"]]
+    responses["deepseek"] = {"items": [{"name": "牛肉面", "grams": 500, "count": 1, "unit": "碗"}]}
+    for _ in range(10):
+        assert "items" in client.post("/api/meals/parse-text", headers=auth, json={"text": "一碗牛肉面"}).json()
+    d = client.post("/api/meals/parse-text", headers=auth, json={"text": "一碗牛肉面"}).json()
+    assert d["fallback"] == "search" and d["reason"] == "quota"
+
+
+def test_unlimited_tier_still_has_hard_cap():
+    from datetime import date
+
+    for _ in range(quota.HARD_CAP["day"]):
+        assert quota.try_consume("food", 1, "max", date(2026, 1, 1))
+    assert not quota.try_consume("food", 1, "max", date(2026, 1, 1))

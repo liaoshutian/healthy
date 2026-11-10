@@ -43,7 +43,7 @@ def user_public(db: Session, user: User) -> dict:
         "medical_consent": user.medical_consent_at is not None,
         "tier": tier,
         "tier_end_at": end_at,
-        "quotas": [quota.usage(f, user.id, tier, today) for f in quota.LIMITS],
+        "quotas": [quota.usage(f, user.id, tier, today) for f in quota.LIMITS if quota.allowed(f, tier)],
     }
 
 

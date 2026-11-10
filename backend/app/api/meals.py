@@ -112,9 +112,13 @@ class TextIn(BaseModel):
 @router.post("/meals/parse-text")
 def parse_text(body: TextIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
     """“一碗牛肉面加个蛋” → 草稿。"""
+    today = clock.today()
+    if not quota.try_consume("text", user.id, tier_of(db, user), today):
+        return {"fallback": "search", "reason": "quota", "message": "今天的文字识别次数用完啦，搜一下食物手动记吧"}
     try:
         data, _ = parse_meal_text(db, user.id, body.text)
     except AllProvidersFailed:
+        quota.refund("text", user.id, today)
         return {"fallback": "search", "reason": "ai_failed", "message": "没看懂，搜一下食物手动记吧"}
     items = [ItemIn(name=r["name"][:64], grams=r["grams"], count=r["count"], unit=(r["unit"] or None) and str(r["unit"])[:8],
                     category=r.get("category"), per100g=r.get("per100g")) for r in data["items"]]

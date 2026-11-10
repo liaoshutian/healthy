@@ -8,6 +8,7 @@ BENEFITS = {
     ],
     "rows": [
         {"key": "food", "label": "拍食物识别", "free": "3 次/天", "pro": "30 次/天", "max": "不限"},
+        {"key": "text", "label": "一句话记餐", "free": "10 次/天", "pro": "60 次/天", "max": "不限"},
         {"key": "inbody", "label": "拍 InBody 报告", "free": "1 次/月", "pro": "不限", "max": "不限"},
         {"key": "interpret", "label": "指标解读", "free": "色条与上次对比", "pro": "+ AI 文字解读", "max": "+ AI 阶段建议"},
         {"key": "plans", "label": "饮食挑战", "free": "看点亮", "pro": "+ 原因和替换建议", "max": "+ 自定义挑战"},

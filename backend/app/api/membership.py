@@ -15,7 +15,7 @@ def state(db: Session, user: User) -> dict:
         end = end_at if end_at.tzinfo else end_at.replace(tzinfo=clock.TZ)
         days_left = max(0, (end - clock.now()).days)
     return {"tier": tier, "end_at": end_at, "days_left": days_left, "member_id": f"QN{user.id:06d}",
-            "quotas": [quota.usage(f, user.id, tier, clock.today()) for f in quota.LIMITS], "benefits": BENEFITS}
+            "quotas": [quota.usage(f, user.id, tier, clock.today()) for f in quota.LIMITS if quota.allowed(f, tier)], "benefits": BENEFITS}
 
 
 @router.get("")
