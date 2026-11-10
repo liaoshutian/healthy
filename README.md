@@ -44,6 +44,8 @@ pytest -q                            # 24 个测试；设 TEST_DATABASE_URL 可�
 
 ## 部署到 Lighthouse
 
+完整的上线步骤（Lighthouse、公众平台配置、上传提审发布、上线自查）见 [docs/DEPLOY.md](docs/DEPLOY.md)。下面是后端部分的速记：
+
 ```bash
 git clone https://github.com/liaoshutian/healthy /opt/healthy
 cd /opt/healthy/deploy
