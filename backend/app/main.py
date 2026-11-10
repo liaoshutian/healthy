@@ -26,7 +26,7 @@ async def lifespan(_app: FastAPI):
     yield
 
 
-app = FastAPI(title="青柠生活 API", version="0.1.0", lifespan=lifespan,
+app = FastAPI(title="吃饱睡好簿 API", version="0.1.0", lifespan=lifespan,
               docs_url="/api/docs" if get_settings().env == "dev" else None)
 
 for r in (auth, me, uploads, meals, challenges, body, routines, health, overview, membership, admin):
