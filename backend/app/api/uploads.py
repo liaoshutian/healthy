@@ -10,7 +10,7 @@ from PIL import Image, ImageOps
 from app.api.deps import Session, User, current_user, get_db, own
 from app.config import get_settings
 from app.models import Upload
-from app.services.storage import LocalStorage, get_storage, new_key
+from app.services.storage import get_storage, new_key
 
 router = APIRouter(tags=["uploads"])
 KINDS = {"food", "inbody", "medicine", "medical", "routine", "avatar"}
@@ -40,11 +40,8 @@ def _sign(key: str, exp: int) -> str:
 def file_url(up: Upload | None) -> str | None:
     if up is None:
         return None
-    storage = get_storage()
-    if isinstance(storage, LocalStorage):
-        exp = int(time.time()) + 3600
-        return f"{storage.url(up.key)}?exp={exp}&sig={_sign(up.key, exp)}"
-    return storage.url(up.key)
+    exp = int(time.time()) + 3600
+    return f"{get_storage().url(up.key)}?exp={exp}&sig={_sign(up.key, exp)}"
 
 
 @router.post("/api/uploads")
@@ -79,13 +76,11 @@ def delete_upload(upload_id: int, user: User = Depends(current_user), db: Sessio
 
 @router.get("/api/files/{key:path}")
 def local_file(key: str, exp: int, sig: str):
-    """仅本地存储使用：带签名的临时链接（小程序 <image> 不能带登录头）。"""
+    """带签名的临时链接（小程序 <image> 不能带登录头）。"""
     storage = get_storage()
-    if not isinstance(storage, LocalStorage):
-        raise HTTPException(404)
     if exp < time.time() or not hmac.compare_digest(sig, _sign(key, exp)):
         raise HTTPException(403, "链接已过期")
     try:
-        return Response(storage.get(key), media_type="image/jpeg")
+        return Response(storage.get(key), media_type="image/jpeg", headers={"Cache-Control": "private, max-age=3600"})
     except (FileNotFoundError, ValueError):
         raise HTTPException(404)

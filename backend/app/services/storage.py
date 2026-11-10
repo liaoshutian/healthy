@@ -1,4 +1,4 @@
-"""图片存储：开发用本地磁盘，生产用腾讯云 COS（私有读 + 临时签名链接）。"""
+"""图片存储：全部存在 Lighthouse 本机磁盘（docker 卷挂到宿主机目录），通过带签名的临时链接访问。"""
 import os
 import uuid
 from datetime import datetime
@@ -48,30 +48,8 @@ class LocalStorage(Storage):
             pass
 
     def url(self, key, expires=3600):
-        # 本地开发时由 /api/files 路由按登录态返回
+        # 由 /api/files 路由校验签名后返回
         return f"{self.base_url}/api/files/{key}"
-
-
-class COSStorage(Storage):
-    def __init__(self, s):
-        from qcloud_cos import CosConfig, CosS3Client
-
-        cfg = CosConfig(Region=s.cos_region, SecretId=s.cos_secret_id, SecretKey=s.cos_secret_key, Scheme="https")
-        self.client = CosS3Client(cfg)
-        self.bucket = s.cos_bucket
-
-    def put(self, key, data, content_type):
-        self.client.put_object(Bucket=self.bucket, Key=key, Body=data, ContentType=content_type)
-
-    def get(self, key):
-        resp = self.client.get_object(Bucket=self.bucket, Key=key)
-        return resp["Body"].get_raw_stream().read()
-
-    def delete(self, key):
-        self.client.delete_object(Bucket=self.bucket, Key=key)
-
-    def url(self, key, expires=3600):
-        return self.client.get_presigned_url(Method="GET", Bucket=self.bucket, Key=key, Expired=expires)
 
 
 _storage: Storage | None = None
@@ -81,10 +59,7 @@ def get_storage() -> Storage:
     global _storage
     if _storage is None:
         s = get_settings()
-        if s.storage_backend == "cos":
-            _storage = COSStorage(s)
-        else:
-            _storage = LocalStorage(s.local_storage_dir, s.public_base_url)
+        _storage = LocalStorage(s.local_storage_dir, s.public_base_url)
     return _storage
 
 

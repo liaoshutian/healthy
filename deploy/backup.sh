@@ -1,15 +1,15 @@
 #!/bin/sh
-# 每日数据库备份并上传 COS。加到 crontab：
-#   30 3 * * * cd /opt/healthy/deploy && ./backup.sh >> backups/backup.log 2>&1
-# 上传需要安装 coscli 并配置好（https://cloud.tencent.com/document/product/436/63143）。
+# 每日在本机备份数据库和图片。加到 crontab：
+#   30 3 * * * cd /opt/healthy/deploy && mkdir -p backups && ./backup.sh >> backups/backup.log 2>&1
+# 备份都留在 Lighthouse 本机的 deploy/backups/，建议定期再拷一份到别的地方（比如自己电脑），
+# 或者在腾讯云控制台给这台 Lighthouse 开自动快照。
 set -e
 cd "$(dirname "$0")"
 mkdir -p backups
-FILE="qingning-$(date +%Y%m%d-%H%M).sql.gz"
-docker compose exec -T db pg_dump -U qingning qingning | gzip > "backups/$FILE"
-if command -v coscli >/dev/null 2>&1; then
-  coscli cp "backups/$FILE" "cos://${COS_BACKUP_BUCKET:-qingning-backup}/db/$FILE"
-fi
-# 本地只留 14 天
-find backups -name 'qingning-*.sql.gz' -mtime +14 -delete
-echo "$(date) backup ok: $FILE"
+STAMP=$(date +%Y%m%d-%H%M)
+docker compose exec -T db pg_dump -U qingning qingning | gzip > "backups/db-$STAMP.sql.gz"
+tar -czf "backups/uploads-$STAMP.tar.gz" -C data uploads
+# 数据库留 14 天，图片包较大只留 3 天（图片本身一直在 data/uploads 里）
+find backups -name 'db-*.sql.gz' -mtime +14 -delete
+find backups -name 'uploads-*.tar.gz' -mtime +3 -delete
+echo "$(date) backup ok: $STAMP"

@@ -3,12 +3,16 @@ from datetime import date
 
 from app.config import get_settings
 
-# (周期, Free 上限, Pro 上限, Max 上限)；None = 不限
+# 所有调用大模型的接口都必须先过这里：(周期, Free 上限, Pro 上限, Max 上限)；None = 不限，0 = 该等级没有这项权益。
+# “不限”也只是对用户展示的口径，另有 HARD_CAP 兜底防刷。
 LIMITS: dict[str, tuple[str, int | None, int | None, int | None]] = {
     "food": ("day", 3, 30, None),
     "inbody": ("month", 1, None, None),
     "medicine": ("day", 3, 30, None),
+    "text": ("day", 10, 60, None),
+    "interpret": ("day", 0, 10, 30),
 }
+HARD_CAP = {"day": 200, "month": 300}
 
 
 class _MemoryCounter:
@@ -63,6 +67,11 @@ def limit_for(feature: str, tier: str) -> int | None:
     return {"free": free, "pro": pro, "max": mx}[tier]
 
 
+def allowed(feature: str, tier: str) -> bool:
+    """该等级是否有这项权益（上限为 0 即没有）。"""
+    return limit_for(feature, tier) != 0
+
+
 def usage(feature: str, user_id: int, tier: str, today: date) -> dict:
     key, _ = _key(feature, user_id, today)
     used = int(get_counter().get(key) or 0)
@@ -78,7 +87,9 @@ def try_consume(feature: str, user_id: int, tier: str, today: date) -> bool:
     if n == 1:
         c.expire(key, ttl)
     limit = limit_for(feature, tier)
-    if limit is not None and n > limit:
+    if limit is None:
+        limit = HARD_CAP[LIMITS[feature][0]]
+    if n > limit:
         c.decr(key)
         return False
     return True

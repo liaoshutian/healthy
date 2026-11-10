@@ -26,18 +26,14 @@ class Settings(BaseSettings):
     # 管理后台
     admin_token: str = ""
 
-    # 图片存储：local 或 cos
-    storage_backend: str = "local"
+    # 图片存在本机磁盘
     local_storage_dir: str = "./uploads"
     public_base_url: str = "http://localhost:8000"
-    cos_secret_id: str = ""
-    cos_secret_key: str = ""
-    cos_region: str = "ap-guangzhou"
-    cos_bucket: str = ""
 
     # 大模型：看图主模型 ChatGPT，备用通义千问 VL；文字用 DeepSeek
     openai_api_key: str = ""
-    openai_base_url: str = "https://api.openai.com/v1"
+    # 不直连 OpenAI，必须填自己服务器上的中转地址（OpenAI 兼容接口，如 https://relay.example.com/v1）；留空则不调用 ChatGPT
+    openai_base_url: str = ""
     openai_vision_model: str = "gpt-4.1"
     qwen_api_key: str = ""
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
