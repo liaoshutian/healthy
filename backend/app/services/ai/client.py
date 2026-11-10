@@ -34,11 +34,11 @@ def vision_providers() -> list[Provider]:
 
 
 def text_providers() -> list[Provider]:
-    """纯文字：DeepSeek，失败时退到 ChatGPT。"""
+    """纯文字：主模型 ChatGPT（只走配置的中转地址），失败切到 DeepSeek。没配 key 或地址的跳过。"""
     s = get_settings()
     providers = [
-        Provider("deepseek", s.deepseek_base_url, s.deepseek_api_key, s.deepseek_model, True),
         Provider("openai", s.openai_base_url, s.openai_api_key, s.openai_text_model, True, s.openai_reasoning_effort or None),
+        Provider("deepseek", s.deepseek_base_url, s.deepseek_api_key, s.deepseek_model, True),
     ]
     return [p for p in providers if p.api_key and p.base_url]
 
