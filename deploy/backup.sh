@@ -1,6 +1,6 @@
 #!/bin/sh
 # 每日在本机备份数据库和图片。加到 crontab：
-#   30 3 * * * cd /opt/healthy/deploy && ./backup.sh >> backups/backup.log 2>&1
+#   30 3 * * * cd /opt/healthy/deploy && mkdir -p backups && ./backup.sh >> backups/backup.log 2>&1
 # 备份都留在 Lighthouse 本机的 deploy/backups/，建议定期再拷一份到别的地方（比如自己电脑），
 # 或者在腾讯云控制台给这台 Lighthouse 开自动快照。
 set -e

@@ -48,12 +48,23 @@ cd /opt/healthy/deploy
 cp .env.example .env    # 填密码、AppSecret、OpenAI 中转地址、各家模型 key
 mkdir certs             # 放 api.rexliao.cn 的 Nginx 证书（腾讯云免费 SSL 证书即可）
 docker compose up -d --build
-crontab -e              # 加一行：30 3 * * * cd /opt/healthy/deploy && ./backup.sh >> backups/backup.log 2>&1
+crontab -e              # 加一行：30 3 * * * cd /opt/healthy/deploy && mkdir -p backups && ./backup.sh >> backups/backup.log 2>&1
 ```
 
 API 容器启动时会自动跑数据库迁移，并把首发食物库（94 条）灌进去。
 
 数据库、Redis 和用户上传的图片都存在本机 `deploy/data/` 下；`backup.sh` 每天把数据库和图片打包到 `deploy/backups/`，建议再开 Lighthouse 自动快照或定期拷走一份。
+
+> 如果之前按旧版（Docker 命名卷 `pgdata`）部署过，切到本目录挂载前先导出再导入，否则新库是空的：
+>
+> ```bash
+> docker compose exec -T db pg_dump -U qingning qingning > old.sql   # 在旧版本下执行
+> git pull && docker compose up -d db && sleep 5
+> docker compose exec -T db psql -U qingning qingning < old.sql
+> docker compose up -d --build
+> ```
+>
+> 旧版的上传图片在命名卷 `uploads` 里，可用 `docker run --rm -v deploy_uploads:/from -v $PWD/data/uploads:/to alpine cp -a /from/. /to/` 拷过来。
 
 ## 上线前需要 Rex 准备的
 
