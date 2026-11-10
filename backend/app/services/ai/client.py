@@ -23,13 +23,13 @@ class AIError(Exception):
 
 
 def vision_providers() -> list[Provider]:
-    """看图：主模型 ChatGPT，失败切到通义千问 VL。没配 key 的跳过。"""
+    """看图：主模型 ChatGPT（只走配置的中转地址），失败切到通义千问 VL。没配 key 或地址的跳过。"""
     s = get_settings()
     providers = [
         Provider("openai", s.openai_base_url, s.openai_api_key, s.openai_vision_model, True),
         Provider("qwen", s.qwen_base_url, s.qwen_api_key, s.qwen_vision_model, False),
     ]
-    return [p for p in providers if p.api_key]
+    return [p for p in providers if p.api_key and p.base_url]
 
 
 def text_providers() -> list[Provider]:
@@ -39,7 +39,7 @@ def text_providers() -> list[Provider]:
         Provider("deepseek", s.deepseek_base_url, s.deepseek_api_key, s.deepseek_model, True),
         Provider("openai", s.openai_base_url, s.openai_api_key, "gpt-4.1-mini", True),
     ]
-    return [p for p in providers if p.api_key]
+    return [p for p in providers if p.api_key and p.base_url]
 
 
 def image_part(data: bytes, content_type: str = "image/jpeg") -> dict:

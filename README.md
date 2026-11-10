@@ -4,9 +4,9 @@
 方案文档见项目内的《交互与产品方案 v0.1》。
 
 ```
-backend/       Python FastAPI 后端（PostgreSQL + Redis，图片存腾讯云 COS）
+backend/       Python FastAPI 后端（PostgreSQL + Redis，图片存本机磁盘）
 miniprogram/   原生微信小程序（TypeScript）
-deploy/        腾讯云 Lighthouse 上的 Docker Compose、Nginx、备份脚本
+deploy/        腾讯云 Lighthouse 上的 Docker Compose、Nginx、备份脚本（所有服务和数据都在这一台机器上）
 ```
 
 ## 第一期做了什么
@@ -15,7 +15,7 @@ deploy/        腾讯云 Lighthouse 上的 Docker Compose、Nginx、备份脚本
 | --- | --- | --- |
 | 登录 | 静默登录，新手引导 4 屏（可跳过） | `wx.login` 换 openid，发 JWT；新用户送 7 天 Pro |
 | 今日 | 一片青柠 6 瓣（早/午/晚餐、喝水、称一称、照顾自己），今日饭量用碗饭/鸡翅/盘菜/苹果展示，规律提醒，身体快照，“今天好些了吗？” | `/api/today` |
-| 拍食物 | 拍照 → 结果卡（照片上标点、份量 ± 半份、改名、补一项）→ 保存；一句话记饭；和之前一样 | 大模型只“看懂”，热量由食物库算；ChatGPT 失败自动切通义千问 VL；都失败退到食物库搜索 |
+| 拍食物 | 拍照 → 结果卡（照片上标点、份量 ± 半份、改名、补一项）→ 保存；一句话记饭；和之前一样 | 大模型只“看懂”，热量由食物库算；ChatGPT（走自己的中转）失败自动切通义千问 VL；都失败退到食物库搜索 |
 | 挑战卡 | 均衡、低碳、生酮、原始人、地中海 5 张卡，可试玩 3 天、暂停、换卡 | 宏量 50 + 禁忌 30 + 推荐 20 打分，70 分点亮，一天点亮 2 顿算达成；不出现“超标/失败” |
 | 体成分 | 拍 InBody 报告 / 只记体重 / 手动填写；低置信度字段标黄；偏低/标准/偏高色条；AI 解读（Pro） | 生理关系交叉校验（BMI、体脂量 + 去脂体重 ≈ 体重…），校验不过也会切换模型 |
 | 规律生活 | 10 个模板 + 自定义，环形倒计时，完成/推迟 3 天，照片和花费，实际平均周期建议，写进手机日历 | 一次性订阅消息攒提醒次数，worker 每小时发提醒 |
@@ -45,7 +45,7 @@ pytest -q                            # 24 个测试；设 TEST_DATABASE_URL 可�
 ```bash
 git clone https://github.com/liaoshutian/healthy /opt/healthy
 cd /opt/healthy/deploy
-cp .env.example .env    # 填密码、AppSecret、COS、各家模型 key
+cp .env.example .env    # 填密码、AppSecret、OpenAI 中转地址、各家模型 key
 mkdir certs             # 放 api.rexliao.cn 的 Nginx 证书（腾讯云免费 SSL 证书即可）
 docker compose up -d --build
 crontab -e              # 加一行：30 3 * * * cd /opt/healthy/deploy && ./backup.sh >> backups/backup.log 2>&1
@@ -53,12 +53,14 @@ crontab -e              # 加一行：30 3 * * * cd /opt/healthy/deploy && ./bac
 
 API 容器启动时会自动跑数据库迁移，并把首发食物库（94 条）灌进去。
 
+数据库、Redis 和用户上传的图片都存在本机 `deploy/data/` 下；`backup.sh` 每天把数据库和图片打包到 `deploy/backups/`，建议再开 Lighthouse 自动快照或定期拷走一份。
+
 ## 上线前需要 Rex 准备的
 
 1. **域名**：`api.rexliao.cn` 解析到 Lighthouse，并确认 `rexliao.cn` 的 ICP 备案已完成。
 2. **小程序后台 → 开发管理 → 服务器域名**：request、uploadFile、downloadFile 合法域名都填 `https://api.rexliao.cn`。
 3. **小程序后台 → 设置 → 用户隐私保护指引**：声明相机、相册、头像、日历；不填的话这些接口调不了。
 4. **订阅消息模板**：选“事项提醒”和“用药提醒”类模板，把 ID 填进 `deploy/.env` 的 `WX_TMPL_*` 和 `miniprogram/utils/config.ts`；字段名如与 `backend/app/worker.py` 里的不同需要对一下。
-5. **AppSecret、COS 存储桶（私有读）、OpenAI / 通义千问 / DeepSeek 的 key**。
-6. **OpenAI 的网络**：国内服务器直连 `api.openai.com` 通常不通，需要在 `OPENAI_BASE_URL` 填一个可用的转发地址；转不通时会自动用通义千问 VL 兜底。
+5. **AppSecret、OpenAI / 通义千问 / DeepSeek 的 key**。
+6. **OpenAI 中转**：后端不直连 `api.openai.com`，在 `OPENAI_BASE_URL` 填我们自己服务器上的中转地址（OpenAI 兼容接口，形如 `https://xxx/v1`）。没填或中转不通时自动用通义千问 VL。
 7. 食物库份量换算和挑战卡参数是初稿，建议找营养师审一遍（`backend/app/data/foods.py`、`backend/app/services/plans.py`）。

@@ -276,3 +276,12 @@ def test_expired_challenge_stops_scoring(client, auth):
         ch.start_date = clock.today() - timedelta(days=5)
         db.commit()
     assert client.get("/api/today", headers=auth).json()["challenge"] is None
+
+
+def test_openai_only_via_relay(monkeypatch):
+    from app.config import get_settings
+    from app.services.ai.client import vision_providers
+
+    assert vision_providers()[0].base_url == "https://relay.test/v1"
+    monkeypatch.setattr(get_settings(), "openai_base_url", "")
+    assert [p.name for p in vision_providers()] == ["qwen"]
