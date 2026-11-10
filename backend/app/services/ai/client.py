@@ -16,6 +16,7 @@ class Provider:
     api_key: str
     model: str
     json_mode: bool = True  # 是否支持 response_format=json_object
+    reasoning_effort: str | None = None  # 推理类模型（GPT-5 及以后）用这个，不传 temperature
 
 
 class AIError(Exception):
@@ -26,7 +27,7 @@ def vision_providers() -> list[Provider]:
     """看图：主模型 ChatGPT（只走配置的中转地址），失败切到通义千问 VL。没配 key 或地址的跳过。"""
     s = get_settings()
     providers = [
-        Provider("openai", s.openai_base_url, s.openai_api_key, s.openai_vision_model, True),
+        Provider("openai", s.openai_base_url, s.openai_api_key, s.openai_vision_model, True, s.openai_reasoning_effort or None),
         Provider("qwen", s.qwen_base_url, s.qwen_api_key, s.qwen_vision_model, False),
     ]
     return [p for p in providers if p.api_key and p.base_url]
@@ -37,7 +38,7 @@ def text_providers() -> list[Provider]:
     s = get_settings()
     providers = [
         Provider("deepseek", s.deepseek_base_url, s.deepseek_api_key, s.deepseek_model, True),
-        Provider("openai", s.openai_base_url, s.openai_api_key, "gpt-4.1-mini", True),
+        Provider("openai", s.openai_base_url, s.openai_api_key, s.openai_text_model, True, s.openai_reasoning_effort or None),
     ]
     return [p for p in providers if p.api_key and p.base_url]
 
@@ -65,8 +66,11 @@ def chat_json(provider: Provider, system: str, user_content: list[dict] | str, t
     body = {
         "model": provider.model,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user_content}],
-        "temperature": 0.1,
     }
+    if provider.reasoning_effort:
+        body["reasoning_effort"] = provider.reasoning_effort
+    else:
+        body["temperature"] = 0.1
     if provider.json_mode:
         body["response_format"] = {"type": "json_object"}
     try:
