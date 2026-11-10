@@ -43,9 +43,15 @@ def item_dict(i) -> dict:
 
 
 def active_challenge(db: Session, user: User) -> Challenge | None:
-    return db.scalar(
-        select(Challenge).where(Challenge.user_id == user.id, Challenge.status == "active").order_by(Challenge.id.desc())
-    )
+    """进行中的挑战；到期的顺手标成完成，不再参与打分。"""
+    today = clock.today()
+    for c in db.scalars(select(Challenge).where(Challenge.user_id == user.id, Challenge.status == "active").order_by(Challenge.id.desc())):
+        if (today - c.start_date).days >= c.days:
+            c.status, c.ended_at = "done", clock.now()
+            db.commit()
+            continue
+        return c
+    return None
 
 
 def challenge_public(c: Challenge | None, today: date) -> dict | None:

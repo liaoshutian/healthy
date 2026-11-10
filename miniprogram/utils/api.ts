@@ -39,7 +39,8 @@ function rawRequest<T>(method: string, path: string, data: unknown, token: strin
       url: API_BASE + path,
       method: method as 'GET',
       data: data as WechatMiniprogram.IAnyObject,
-      timeout: 60000,
+      // AI 识别会依次尝试两家模型（各最多 40 秒），客户端要等得比服务端久
+      timeout: 95000,
       header: token ? { Authorization: `Bearer ${token}` } : {},
       success: (res) => {
         if (res.statusCode >= 200 && res.statusCode < 300) {

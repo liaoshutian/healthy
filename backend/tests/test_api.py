@@ -240,3 +240,39 @@ def test_delete_account(client, auth):
     client.post("/api/meals", headers=auth, json={"meal_type": "lunch", "items": [{"name": "米饭", "count": 1}]})
     assert client.delete("/api/me", headers=auth).status_code == 200
     assert client.get("/api/me", headers=auth).status_code == 401
+
+
+def test_review_fixes(client, auth):
+    # 注销后兑换码不能被别人再用；注销会级联删记录
+    code = client.post("/api/admin/codes", headers=ADMIN, json={"tier": "pro", "days": 30, "count": 1}).json()["codes"][0]
+    client.post("/api/membership/redeem", headers=auth, json={"code": code})
+    client.post("/api/meals", headers=auth, json={"meal_type": "lunch", "items": [{"name": "米饭", "count": 1}]})
+    client.delete("/api/me", headers=auth)
+    from app.db import SessionLocal
+    from app.models import MealLog
+    with SessionLocal() as db:
+        assert db.query(MealLog).count() == 0
+    other = login(client, "dave")
+    assert client.post("/api/membership/redeem", headers=other, json={"code": code}).status_code == 400
+    # 头像存引用，返回新签名链接
+    up = upload(client, other, "avatar")
+    me = client.patch("/api/me", headers=other, json={"avatar_upload_id": up["id"]}).json()
+    assert "/api/files/" in me["avatar_url"] and "sig=" in me["avatar_url"]
+
+
+def test_unverified_food_not_matched(client, auth):
+    client.post("/api/meals", headers=auth, json={"meal_type": "lunch", "items": [
+        {"name": "神秘小菜", "grams": 100, "category": "veg", "per100g": {"kcal": 999, "carb": 1, "protein": 1, "fat": 1}}]})
+    d = client.post("/api/meals/preview", headers=auth, json={"items": [{"name": "神秘小菜", "grams": 100, "category": "veg"}]}).json()
+    assert d["items"][0]["estimated"] is True and d["items"][0]["kcal"] < 999
+
+
+def test_expired_challenge_stops_scoring(client, auth):
+    from app.db import SessionLocal
+    from app.models import Challenge
+    c = client.post("/api/challenges", headers=auth, json={"plan_code": "keto", "trial": True}).json()
+    with SessionLocal() as db:
+        ch = db.get(Challenge, c["id"])
+        ch.start_date = clock.today() - timedelta(days=5)
+        db.commit()
+    assert client.get("/api/today", headers=auth).json()["challenge"] is None

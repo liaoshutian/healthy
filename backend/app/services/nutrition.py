@@ -20,7 +20,8 @@ def _norm(s: str) -> str:
 
 
 def all_foods(db: Session) -> list[Food]:
-    return list(db.scalars(select(Food)))
+    """只用审核过的食物做自动匹配；待审的模型估值不能当成可信数据给其他人用。"""
+    return list(db.scalars(select(Food).where(Food.verified.is_(True))))
 
 
 def match(foods: list[Food], name: str, candidates: list[str] | None = None) -> Food | None:

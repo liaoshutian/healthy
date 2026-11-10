@@ -23,6 +23,7 @@ Page({
           id: m.id,
           symptomId: m.symptom_id,
           photoUrl: m.photo_url || '',
+          photoId: m.photo_upload_id || null,
           form: { name: m.name, spec: m.spec || '', dose: m.dose || '', times_per_day: m.times_per_day || '', course_days: m.course_days || '', start_date: m.start_date, remind: m.remind },
         })
       }

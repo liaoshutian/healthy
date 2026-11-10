@@ -184,7 +184,7 @@ def med_public(db: Session, m: MedicationLog) -> dict:
     return {"id": m.id, "symptom_id": m.symptom_id, "name": m.name, "spec": m.spec, "dose": m.dose,
             "times_per_day": m.times_per_day, "course_days": m.course_days, "start_date": m.start_date, "end_date": end,
             "active": end is None or end >= clock.today(), "remind": m.remind, "reminder_credits": m.reminder_credits,
-            "note": m.note, "photo_url": file_url(db.get(Upload, m.photo_upload_id)) if m.photo_upload_id else None}
+            "note": m.note, "photo_upload_id": m.photo_upload_id, "photo_url": file_url(db.get(Upload, m.photo_upload_id)) if m.photo_upload_id else None}
 
 
 @router.post("/medications/recognize")

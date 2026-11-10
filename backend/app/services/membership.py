@@ -34,7 +34,9 @@ def grant(db: Session, user: User, tier: str, days: int, source: str, code: str 
     if tier not in ("pro", "max"):
         raise ValueError("bad tier")
     now = clock.now()
-    sub = db.scalar(select(Subscription).where(Subscription.user_id == user.id))
+    # 锁住这个用户，同一用户的并发兑换/开通排队执行，避免互相覆盖到期时间
+    db.execute(select(User.id).where(User.id == user.id).with_for_update())
+    sub = db.scalar(select(Subscription).where(Subscription.user_id == user.id).with_for_update())
     if sub and _aware(sub.end_at) > now:
         remaining = (_aware(sub.end_at) - now).total_seconds() / 86400
         if sub.tier == tier:
@@ -72,7 +74,7 @@ def redeem(db: Session, user: User, raw_code: str) -> Subscription:
     rc = db.scalar(select(RedeemCode).where(RedeemCode.code == code).with_for_update())
     if not rc or rc.revoked:
         raise RedeemError("兑换码不存在，检查一下有没有输错")
-    if rc.used_by is not None:
+    if rc.used_by is not None or rc.used_at is not None:
         if rc.used_by == user.id:
             # 幂等：同一个人重复提交不会重复加时长
             return db.scalar(select(Subscription).where(Subscription.user_id == user.id))

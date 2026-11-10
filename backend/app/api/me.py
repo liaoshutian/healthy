@@ -16,6 +16,17 @@ from app.services.storage import get_storage
 router = APIRouter(prefix="/api/me", tags=["me"])
 
 
+def avatar_url(db: Session, user: User) -> str | None:
+    """头像存的是 upload:<id>，每次返回时现签一个临时链接，避免链接过期。"""
+    v = user.avatar_url
+    if v and v.startswith("upload:"):
+        from app.api.uploads import file_url
+
+        up = db.get(Upload, int(v[7:]))
+        return file_url(up) if up and up.user_id == user.id else None
+    return v
+
+
 def user_public(db: Session, user: User) -> dict:
     tier, end_at = membership.effective_tier(db, user)
     today = clock.today()
@@ -23,7 +34,7 @@ def user_public(db: Session, user: User) -> dict:
         "id": user.id,
         "member_id": f"QN{user.id:06d}",
         "nickname": user.nickname,
-        "avatar_url": user.avatar_url,
+        "avatar_url": avatar_url(db, user),
         "gender": user.gender,
         "birthday": user.birthday,
         "height_cm": user.height_cm,
@@ -43,7 +54,7 @@ def me(user: User = Depends(current_user), db: Session = Depends(get_db)):
 
 class ProfileIn(BaseModel):
     nickname: str | None = Field(default=None, max_length=32)
-    avatar_url: str | None = Field(default=None, max_length=512)
+    avatar_upload_id: int | None = None
     gender: str | None = Field(default=None, pattern="^(male|female)$")
     birthday: date | None = None
     height_cm: float | None = Field(default=None, ge=80, le=250)
@@ -52,7 +63,14 @@ class ProfileIn(BaseModel):
 
 @router.patch("")
 def update_me(body: ProfileIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
-    for k, v in body.model_dump(exclude_unset=True).items():
+    data = body.model_dump(exclude_unset=True)
+    upload_id = data.pop("avatar_upload_id", None)
+    if upload_id is not None:
+        up = db.get(Upload, upload_id)
+        if not up or up.user_id != user.id:
+            raise HTTPException(404, "没找到这张图片")
+        user.avatar_url = f"upload:{up.id}"
+    for k, v in data.items():
         setattr(user, k, v)
     db.commit()
     return user_public(db, user)

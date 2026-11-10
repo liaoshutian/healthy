@@ -72,8 +72,11 @@ async function api(path, opts = {}) {
   return r;
 }
 const fmt = (s) => s ? new Date(s).toLocaleString('zh-CN') : '';
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// 用户填的内容（昵称等）一律转义；只有我们自己拼的操作按钮用 {html: ...} 原样插入
+const cell = (c) => (c && typeof c === 'object' && 'html' in c) ? c.html : esc(c);
 function table(el, head, rows) {
-  el.innerHTML = '<tr>' + head.map(h => `<th>${h}</th>`).join('') + '</tr>' + rows.map(r => '<tr>' + r.map(c => `<td>${c ?? ''}</td>`).join('') + '</tr>').join('');
+  el.innerHTML = '<tr>' + head.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>' + rows.map(r => '<tr>' + r.map(c => `<td>${cell(c)}</td>`).join('') + '</tr>').join('');
 }
 async function gen() {
   const body = { tier: $('tier').value, days: +$('days').value, count: +$('count').value, batch: $('batch').value || null, redeem_before: $('before').value || null };
@@ -83,7 +86,7 @@ async function gen() {
 async function findUser() {
   const d = await (await api('/api/admin/users?q=' + encodeURIComponent($('q').value))).json();
   table($('users'), ['会员ID', '昵称', '档位', '到期', '操作'], d.map(u => [u.member_id, u.nickname, u.tier, fmt(u.end_at),
-    `<button onclick="grant(${u.id},'pro',30)">+Pro 30天</button> <button onclick="grant(${u.id},'pro',365)">+Pro 1年</button> <button class="ghost" onclick="revoke(${u.id})">撤销</button>`]));
+    { html: `<button onclick="grant(${Number(u.id)},'pro',30)">+Pro 30天</button> <button onclick="grant(${Number(u.id)},'pro',365)">+Pro 1年</button> <button class="ghost" onclick="revoke(${Number(u.id)})">撤销</button>` }]));
 }
 async function grant(id, tier, days) { await api(`/api/admin/users/${id}/grant`, { method: 'POST', body: JSON.stringify({ tier, days }) }); findUser(); logs(); }
 async function revoke(id) { if (confirm('确定撤销？')) { await api(`/api/admin/users/${id}/revoke`, { method: 'POST' }); findUser(); logs(); } }

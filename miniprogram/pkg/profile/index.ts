@@ -1,7 +1,7 @@
 import { get, patch, showError, uploadImage } from '../../utils/api'
 
 Page({
-  data: { form: { nickname: '', avatar_url: '', gender: '', birthday: '', height_cm: '' } as Record<string, any> },
+  data: { form: { nickname: '', avatar_url: '', gender: '', birthday: '', height_cm: '' } as Record<string, any>, avatarUploadId: null as number | null },
 
   async onLoad() {
     try {
@@ -15,7 +15,7 @@ Page({
   async onAvatar(e: WechatMiniprogram.CustomEvent) {
     try {
       const up = await uploadImage(e.detail.avatarUrl, 'avatar')
-      this.setData({ 'form.avatar_url': up.url })
+      this.setData({ 'form.avatar_url': up.url, avatarUploadId: up.id })
     } catch (err) {
       showError(err)
     }
@@ -36,7 +36,7 @@ Page({
   async save() {
     const f = this.data.form
     const body: Record<string, unknown> = { nickname: f.nickname || null }
-    if (f.avatar_url) body.avatar_url = f.avatar_url
+    if (this.data.avatarUploadId) body.avatar_upload_id = this.data.avatarUploadId
     if (f.gender) body.gender = f.gender
     if (f.birthday) body.birthday = f.birthday
     const h = parseFloat(f.height_cm)
