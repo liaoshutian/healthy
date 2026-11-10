@@ -7,7 +7,7 @@
 3. **小程序**：在开发者工具里上传、提审、发布
 
 ```
-小程序 ──HTTPS──> api.rexliao.cn (Lighthouse: Nginx → FastAPI → PostgreSQL / Redis / 本机图片)
+小程序 ──HTTPS──> healthy.rexliao.cn (Lighthouse: Nginx → FastAPI → PostgreSQL / Redis / 本机图片)
                                               └──> 大模型（OpenAI 走你的中转、通义千问、DeepSeek）
 ```
 
@@ -20,7 +20,7 @@
 | `rexliao.cn` ICP 备案 | 腾讯云备案 | 小程序只能连备案过的 HTTPS 域名 |
 | 小程序备案 | 公众平台首页 → 小程序备案 | 没备案不能发布上线 |
 | AppSecret | 公众平台 → 开发管理 → 开发设置 → 生成 | `.env` 的 `WX_SECRET` |
-| SSL 证书 | 腾讯云 → SSL 证书 → 免费证书，申请 `api.rexliao.cn`，下载 **Nginx** 版 | `deploy/certs/` |
+| SSL 证书 | 腾讯云 → SSL 证书 → 免费证书，申请 `healthy.rexliao.cn`，下载 **Nginx** 版 | `deploy/certs/` |
 | OpenAI 中转地址和 key | 你自己的中转 | `OPENAI_BASE_URL`、`OPENAI_API_KEY` |
 | 通义千问 key | 阿里云百炼 → API-KEY | `QWEN_API_KEY` |
 | DeepSeek key | platform.deepseek.com | `DEEPSEEK_API_KEY` |
@@ -36,7 +36,7 @@
 - 镜像选带 Docker 的（Lighthouse 有 “Docker CE” 应用镜像）；或者自己装：`curl -fsSL https://get.docker.com | sh`
 - 配置建议 2 核 4G 起步，磁盘按图片量预留（每张压缩后约 200–500 KB）
 - **防火墙**：Lighthouse 控制台 → 防火墙，放行 TCP 80、443（22 保留给 SSH）
-- **DNS**：`api.rexliao.cn` 加一条 A 记录指向 Lighthouse 公网 IP
+- **DNS**：`healthy.rexliao.cn` 加一条 A 记录指向 Lighthouse 公网 IP
 
 > 如果 OpenAI 中转也在这台机器上并占用了 80/443，需要把它和本项目的 Nginx 合并成一个，或给中转换个端口。
 
@@ -70,8 +70,8 @@ vim .env
 ```bash
 mkdir -p certs
 # 把下载的 Nginx 证书包里的两个文件放进去，文件名要和 nginx/qingning.conf 一致：
-#   certs/api.rexliao.cn_bundle.crt
-#   certs/api.rexliao.cn.key
+#   certs/healthy.rexliao.cn_bundle.crt
+#   certs/healthy.rexliao.cn.key
 ```
 
 ### 1.4 启动
@@ -80,7 +80,7 @@ mkdir -p certs
 docker compose up -d --build
 docker compose ps                 # api、worker、db、redis、nginx 都是 running
 docker compose logs -f api        # 看到 Uvicorn running 即可，Ctrl+C 退出
-curl https://api.rexliao.cn/api/ping
+curl https://healthy.rexliao.cn/api/ping
 ```
 
 API 启动时会自动建表/迁移，并灌入首发食物库。
@@ -97,7 +97,7 @@ crontab -e
 
 ### 1.6 管理后台
 
-浏览器打开 `https://api.rexliao.cn/admin`，输入 `ADMIN_TOKEN`。在这里给知识星球会员批量生成兑换码、按会员 ID 开通或延期、导出快到期名单。
+浏览器打开 `https://healthy.rexliao.cn/admin`，输入 `ADMIN_TOKEN`。在这里给知识星球会员批量生成兑换码、按会员 ID 开通或延期、导出快到期名单。
 
 ### 1.7 以后更新
 
@@ -111,7 +111,7 @@ cd deploy && docker compose up -d --build
 ## 2. 微信公众平台（mp.weixin.qq.com）
 
 1. **基础信息**：名称“青柠生活”、头像、简介；**服务类目**选和功能相符的（个人主体选不了医疗类）。
-2. **开发管理 → 开发设置 → 服务器域名**，四项都填 `https://api.rexliao.cn`：
+2. **开发管理 → 开发设置 → 服务器域名**，四项都填 `https://healthy.rexliao.cn`：
    - request 合法域名
    - uploadFile 合法域名
    - downloadFile 合法域名
@@ -136,17 +136,17 @@ cd deploy && docker compose up -d --build
 3. **本地联调**（可选）：本机跑后端后，右上角“详情 → 本地设置”勾选“不校验合法域名”，开发版会连 `http://localhost:8000`。
 4. **真机预览**：点“预览”扫码。真机上的开发版也连 `localhost`，想在手机上连正式后端，用“上传”后的体验版。
 5. **上传**：点“上传”，填版本号（如 `0.1.0`）和备注。
-6. **体验版**：公众平台 → 版本管理 → 开发版本 → 设为体验版；成员管理里加体验成员。体验版连的是 `https://api.rexliao.cn`。
+6. **体验版**：公众平台 → 版本管理 → 开发版本 → 设为体验版；成员管理里加体验成员。体验版连的是 `https://healthy.rexliao.cn`。
 7. **提交审核**：版本管理 → 提交审核，填功能页面和测试账号说明（登录是静默的，不需要账号）。
 8. **发布**：审核通过后在版本管理里点“发布”。
 
-后端地址的切换逻辑在 `miniprogram/utils/config.ts`：开发版连本地，体验版和正式版连 `api.rexliao.cn`。
+后端地址的切换逻辑在 `miniprogram/utils/config.ts`：开发版连本地，体验版和正式版连 `healthy.rexliao.cn`。
 
 ---
 
 ## 4. 上线前自查
 
-- [ ] `curl https://api.rexliao.cn/api/ping` 正常
+- [ ] `curl https://healthy.rexliao.cn/api/ping` 正常
 - [ ] 体验版能登录，“我的”里能看到 7 天 Pro 试用
 - [ ] 拍一张食物能识别；把中转地址故意填错后会自动切到通义千问
 - [ ] 拍体测报告、读药盒能出结果

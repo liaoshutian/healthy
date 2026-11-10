@@ -50,7 +50,7 @@ pytest -q                            # 24 个测试；设 TEST_DATABASE_URL 可�
 git clone https://github.com/liaoshutian/healthy /opt/healthy
 cd /opt/healthy/deploy
 cp .env.example .env    # 填密码、AppSecret、OpenAI 中转地址、各家模型 key
-mkdir certs             # 放 api.rexliao.cn 的 Nginx 证书（腾讯云免费 SSL 证书即可）
+mkdir certs             # 放 healthy.rexliao.cn 的 Nginx 证书（腾讯云免费 SSL 证书即可）
 docker compose up -d --build
 crontab -e              # 加一行：30 3 * * * cd /opt/healthy/deploy && mkdir -p backups && ./backup.sh >> backups/backup.log 2>&1
 ```
@@ -72,8 +72,8 @@ API 容器启动时会自动跑数据库迁移，并把首发食物库（94 条�
 
 ## 上线前需要 Rex 准备的
 
-1. **域名**：`api.rexliao.cn` 解析到 Lighthouse，并确认 `rexliao.cn` 的 ICP 备案已完成。
-2. **小程序后台 → 开发管理 → 服务器域名**：request、uploadFile、downloadFile 合法域名都填 `https://api.rexliao.cn`。
+1. **域名**：`healthy.rexliao.cn` 解析到 Lighthouse，并确认 `rexliao.cn` 的 ICP 备案已完成。
+2. **小程序后台 → 开发管理 → 服务器域名**：request、uploadFile、downloadFile 合法域名都填 `https://healthy.rexliao.cn`。
 3. **小程序后台 → 设置 → 用户隐私保护指引**：声明相机、相册、头像、日历；不填的话这些接口调不了。
 4. **订阅消息模板**：已选好“日程提醒”（编号 46076，字段 time1 日程时间 + thing2 备注），规律小事和吃药提醒共用，ID 已写进 `deploy/.env.example` 的 `WX_TMPL_ROUTINE` 和 `miniprogram/utils/config.ts`。换模板时两处一起改，并对一下 `backend/app/worker.py` 里 `reminder_data` 的字段名。
 5. **AppSecret、OpenAI / 通义千问 / DeepSeek 的 key**。
