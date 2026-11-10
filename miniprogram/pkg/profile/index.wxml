@@ -1,0 +1,22 @@
+<view class="page">
+  <view class="card center">
+    <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onAvatar">
+      <image class="avatar" src="{{form.avatar_url || '/assets/avatar.png'}}" mode="aspectFill" />
+    </button>
+    <view class="tiny muted mt">点头像换一张</view>
+  </view>
+  <view class="card">
+    <view class="field"><text class="label">昵称</text><input type="nickname" value="{{form.nickname}}" placeholder="叫你什么好" bindchange="onNick" bindinput="onNick" /></view>
+    <view class="field"><text class="label">性别</text>
+      <view class="flex1" style="text-align:right">
+        <text class="chip {{form.gender === 'female' ? 'on' : ''}}" data-v="female" bindtap="pickGender">女</text>
+        <text class="chip {{form.gender === 'male' ? 'on' : ''}}" data-v="male" bindtap="pickGender">男</text>
+      </view>
+    </view>
+    <picker mode="date" value="{{form.birthday}}" start="1930-01-01" end="2020-12-31" bindchange="onBirthday">
+      <view class="field"><text class="label">生日</text><text class="flex1" style="text-align:right">{{form.birthday || '选一下'}}</text></view>
+    </picker>
+    <view class="field"><text class="label">身高</text><input type="digit" value="{{form.height_cm}}" bindinput="onHeight" /><text class="muted small">cm</text></view>
+  </view>
+  <view class="btn" bindtap="save">保存</view>
+</view>

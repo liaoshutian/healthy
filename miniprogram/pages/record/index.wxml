@@ -1,0 +1,30 @@
+<view class="page">
+  <view class="muted small">拍一下就记好，不想拍也可以手动填</view>
+  <view class="grid mt">
+    <view wx:for="{{actions}}" wx:key="key" class="action" data-key="{{item.key}}" bindtap="go">
+      <view class="a-icon">{{item.icon}}</view>
+      <view class="a-title">{{item.title}}</view>
+      <view class="tiny muted">{{item.desc}}</view>
+      <view wx:if="{{item.manual}}" class="manual tiny" data-key="{{item.key}}" catchtap="goManual">手动填写</view>
+    </view>
+  </view>
+
+  <view class="card mt2">
+    <view class="card-title">一句话记饭</view>
+    <view class="row gap">
+      <input class="flex1 text-input" placeholder="比如：一碗牛肉面加个蛋" value="{{text}}" bindinput="onText" confirm-type="done" bindconfirm="parseText" />
+      <view class="btn small" bindtap="parseText">识别</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{recent.length}}">
+    <view class="card-title">和之前一样</view>
+    <view wx:for="{{recent}}" wx:key="id" class="between recent">
+      <view class="flex1">
+        <view class="ellipsis">{{item.title}}</view>
+        <view class="tiny muted">{{item.when}}</view>
+      </view>
+      <view class="btn small ghost" data-id="{{item.id}}" bindtap="copy">再记一次</view>
+    </view>
+  </view>
+</view>

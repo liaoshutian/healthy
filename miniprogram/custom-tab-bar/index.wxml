@@ -1,0 +1,7 @@
+<view class="bar">
+  <view wx:for="{{list}}" wx:key="path" class="item {{selected === index ? 'on' : ''}} {{item.center ? 'center' : ''}}" data-index="{{index}}" bindtap="go">
+    <view wx:if="{{item.center}}" class="plus">＋</view>
+    <text wx:else class="icon">{{item.icon}}</text>
+    <text class="text">{{item.text}}</text>
+  </view>
+</view>

@@ -1,0 +1,45 @@
+<view class="page">
+  <view class="card center">
+    <view class="r-icon">{{d.icon}}</view>
+    <view class="big">{{d.name}}</view>
+    <view class="muted small">每 {{d.cycle_days}} 天 · {{d.text}}</view>
+    <view class="row mt2">
+      <view class="flex1"><view class="big">{{d.average_cycle || '-'}}</view><view class="tiny muted">实际平均周期（天）</view></view>
+      <view class="flex1"><view class="big">{{regularity}}</view><view class="tiny muted">按时完成率</view></view>
+      <view class="flex1"><view class="big">{{d.reminder_credits}}</view><view class="tiny muted">已预约提醒</view></view>
+    </view>
+    <view wx:if="{{d.suggestion}}" class="hint small mt" bindtap="applySuggestion">💡 {{d.suggestion}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">今天完成了</view>
+    <input class="in" placeholder="备注（比如：剪短了一点）" value="{{note}}" bindinput="onNote" />
+    <input class="in mt" type="digit" placeholder="花费（可不填）" value="{{cost}}" bindinput="onCost" />
+    <view class="row wrap mt">
+      <image wx:for="{{photos}}" wx:key="id" src="{{item.url}}" class="thumb" mode="aspectFill" />
+      <view class="thumb add" bindtap="addPhoto">＋照片</view>
+    </view>
+    <view class="row gap mt">
+      <view class="btn ghost flex1" bindtap="snooze">推迟 3 天</view>
+      <view class="btn flex1" bindtap="done">完成了</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">时间轴</view>
+    <view wx:if="{{!d.logs.length}}" class="empty">还没有记录</view>
+    <view wx:for="{{d.logs}}" wx:key="id" class="log">
+      <view class="dot"></view>
+      <view class="flex1">
+        <view>{{item.done_date}}<text wx:if="{{item.cost}}" class="muted small"> · ¥{{item.cost}}</text></view>
+        <view wx:if="{{item.note}}" class="small muted">{{item.note}}</view>
+        <view class="row wrap"><image wx:for="{{item.photos}}" wx:for-item="p" wx:key="*this" src="{{p}}" class="thumb" mode="aspectFill" data-url="{{p}}" bindtap="preview" /></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="row gap">
+    <view class="btn ghost flex1" bindtap="edit">编辑</view>
+    <view class="btn ghost flex1" bindtap="archive">不再管这件事</view>
+  </view>
+</view>

@@ -1,0 +1,47 @@
+<view class="page">
+  <view class="seg">
+    <view wx:for="{{modes}}" wx:key="key" class="seg-item {{mode === item.key ? 'on' : ''}}" data-key="{{item.key}}" bindtap="switchMode">{{item.label}}</view>
+  </view>
+
+  <!-- 拍 InBody -->
+  <view wx:if="{{mode === 'inbody' && !recognized}}" class="center">
+    <view class="frame">
+      <view class="a4">A4</view>
+      <view class="muted mt">平放、无反光、拍全四角</view>
+      <view class="tiny muted">很多人已经拍过了，也可以从相册选</view>
+    </view>
+    <view wx:if="{{loading}}" class="mt2"><view class="muted">正在读取 25 项指标…</view></view>
+    <view wx:else>
+      <view class="btn mt2" bindtap="shoot">拍报告</view>
+      <view class="btn ghost mt" bindtap="album">从相册选</view>
+    </view>
+  </view>
+
+  <view wx:if="{{mode === 'weight'}}" class="card center">
+    <view class="muted">今天的体重</view>
+    <view class="weight-input row">
+      <input type="digit" class="w flex1" value="{{form.weight_kg}}" placeholder="0.0" data-key="weight_kg" bindinput="onField" focus />
+      <text class="muted">kg</text>
+    </view>
+  </view>
+
+  <!-- 确认表单：低置信度字段标黄 -->
+  <view wx:if="{{mode === 'manual' || (mode === 'inbody' && recognized)}}">
+    <image wx:if="{{imageUrl}}" class="report" src="{{imageUrl}}" mode="aspectFit" bindtap="previewImage" />
+    <view wx:if="{{lowCount}}" class="hint small">黄色的几项小柠没太看清，对照原图核对一下</view>
+    <view class="card">
+      <picker mode="date" value="{{date}}" bindchange="pickDate">
+        <view class="field"><text class="label">测量日期</text><text class="flex1" style="text-align:right">{{date}}</text></view>
+      </picker>
+      <view wx:for="{{fields}}" wx:key="key" class="field {{low[item.key] ? 'low' : ''}}">
+        <text class="label">{{item.label}}</text>
+        <input type="digit" value="{{form[item.key]}}" placeholder="—" data-key="{{item.key}}" bindinput="onField" />
+        <text class="unit muted small">{{item.unit}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar" wx:if="{{mode !== 'inbody' || recognized}}">
+    <view class="btn {{saving ? 'disabled' : ''}}" bindtap="save">保存</view>
+  </view>
+</view>

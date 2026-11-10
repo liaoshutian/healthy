@@ -1,0 +1,83 @@
+<!-- 没有 id 时是列表 -->
+<view class="page" wx:if="{{!id}}">
+  <view class="btn" bindtap="newSymptom">＋ 记一次不舒服</view>
+  <view class="card mt2">
+    <view class="card-title">不适记录</view>
+    <view wx:if="{{!symptoms.length}}" class="empty">没有记录，身体棒棒的</view>
+    <view wx:for="{{symptoms}}" wx:key="id" class="between li" data-id="{{item.id}}" bindtap="open">
+      <view class="flex1">
+        <view class="ellipsis">{{item.title}}</view>
+        <view class="tiny muted">{{item.when}} · {{item.days}} 天</view>
+      </view>
+      <text class="tag {{item.status === 'active' ? 'yellow' : ''}}">{{item.status === 'active' ? '进行中' : '已痊愈'}}</text>
+    </view>
+  </view>
+  <view class="card">
+    <view class="card-title">用药<text class="more" bindtap="newMed">＋ 记药</text></view>
+    <view wx:for="{{meds}}" wx:key="id" class="li" data-id="{{item.id}}" bindtap="openMed">
+      <view>{{item.name}} <text class="small muted">{{item.spec || ''}}</text></view>
+      <view class="tiny muted">{{item.start_date}} 起<text wx:if="{{item.course_days}}">，{{item.course_days}} 天</text></view>
+    </view>
+    <view wx:if="{{!meds.length}}" class="empty">没有用药记录</view>
+  </view>
+  <view class="card">
+    <view class="card-title">就诊与病历<text class="more" bindtap="newRecord">＋ 记一次</text></view>
+    <view wx:for="{{records}}" wx:key="id" class="li" data-id="{{item.id}}" bindtap="openRecord">
+      <view>{{item.visit_date}} {{item.hospital || ''}} {{item.department || ''}}</view>
+      <view class="tiny muted ellipsis">{{item.diagnosis || ''}}</view>
+    </view>
+    <view wx:if="{{!records.length}}" class="empty">没有就诊记录</view>
+  </view>
+</view>
+
+<!-- 某一次不适的时间线 -->
+<view class="page" wx:else>
+  <view class="card">
+    <view class="big">{{title}}</view>
+    <view class="small muted">{{when}} 开始 · 第 {{s.days}} 天<text wx:if="{{s.status === 'healed'}}"> · 已痊愈</text></view>
+    <view class="row wrap mt"><text wx:for="{{s.parts}}" wx:key="code" class="chip">📍 {{item.label}}</text></view>
+  </view>
+
+  <view class="card" wx:if="{{s.status === 'active'}}">
+    <view class="card-title">今天好些了吗？</view>
+    <view>现在的难受程度：{{follow}}/10</view>
+    <slider min="0" max="10" value="{{follow}}" activeColor="#7DBE3C" block-size="22" bindchange="onFollow" />
+    <input class="in" placeholder="备注" value="{{followNote}}" bindinput="onFollowNote" />
+    <view class="row gap mt">
+      <view class="btn ghost flex1" bindtap="saveFollow">记一下</view>
+      <view class="btn flex1" bindtap="heal">已痊愈</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{curve.length > 1}}">
+    <view class="card-title">症状曲线</view>
+    <view class="bars">
+      <view wx:for="{{curve}}" wx:key="date" class="bar-col">
+        <view class="bar" style="height:{{item.severity * 16}}rpx"></view>
+        <view class="tiny muted">{{item.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">时间线</view>
+    <view wx:for="{{timeline}}" wx:key="key" class="tl">
+      <text class="tl-icon">{{item.icon}}</text>
+      <view class="flex1">
+        <view class="small">{{item.text}}</view>
+        <view class="tiny muted">{{item.date}}</view>
+        <view class="row wrap" wx:if="{{item.images}}"><image wx:for="{{item.images}}" wx:for-item="img" wx:key="id" src="{{img.url}}" class="thumb" mode="aspectFill" data-url="{{img.url}}" bindtap="preview" /></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="row gap">
+    <view class="btn ghost flex1" bindtap="newMed">＋ 用药</view>
+    <view class="btn ghost flex1" bindtap="newRecord">＋ 就诊/病历</view>
+  </view>
+  <view class="btn mt" bindtap="makeSummary">生成病情摘要（给医生看）</view>
+  <view class="tiny muted center mt">{{s.disclaimer}}</view>
+  <view class="center muted small mt2" bindtap="remove">删除这条记录</view>
+
+  <canvas type="2d" id="summary" class="summary-canvas" style="width:{{canvasW}}px;height:{{canvasH}}px"></canvas>
+</view>

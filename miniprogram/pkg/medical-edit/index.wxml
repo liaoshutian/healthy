@@ -1,0 +1,24 @@
+<view class="page">
+  <view class="card">
+    <picker mode="date" value="{{form.visit_date}}" bindchange="onDate"><view class="field"><text class="label">就诊日期</text><text class="flex1" style="text-align:right">{{form.visit_date}}</text></view></picker>
+    <view class="field"><text class="label">医院</text><input value="{{form.hospital}}" data-key="hospital" bindinput="onField" /></view>
+    <view class="field"><text class="label">科室</text><input value="{{form.department}}" data-key="department" bindinput="onField" /></view>
+    <view class="mt muted small">医生诊断（照原文填）</view>
+    <textarea class="ta" value="{{form.diagnosis}}" data-key="diagnosis" bindinput="onField" maxlength="2000" auto-height />
+  </view>
+  <view class="card">
+    <view class="card-title">病历、处方、检查单<text class="more">最多 20 张</text></view>
+    <view class="row wrap">
+      <view wx:for="{{images}}" wx:key="id" class="img-wrap">
+        <image src="{{item.url}}" class="thumb" mode="aspectFill" data-url="{{item.url}}" bindtap="preview" />
+        <text class="x" data-index="{{index}}" bindtap="removeImage">✕</text>
+      </view>
+      <view class="thumb add" bindtap="addImage">＋</view>
+    </view>
+    <view class="tiny muted mt">图片私有存储，只有你自己能看到</view>
+  </view>
+  <view class="bottom-bar">
+    <view wx:if="{{id}}" class="btn ghost" bindtap="remove">删除</view>
+    <view class="btn" bindtap="save">保存</view>
+  </view>
+</view>

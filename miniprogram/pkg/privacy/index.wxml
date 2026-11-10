@@ -1,0 +1,14 @@
+<view class="page">
+  <view class="card">
+    <view class="card-title">我们怎么对待你的数据</view>
+    <view class="small">· 体重、体脂、饮食、病历和用药都是敏感个人信息，只用来给你记录、画曲线和做解读。</view>
+    <view class="small mt">· 照片私有存储，只有你自己能看到；识别时会发给大模型服务读取内容（看图用 OpenAI，备用为阿里云通义千问），不会用于其他用途。</view>
+    <view class="small mt">· AI 生成的解读会标明“AI 生成”，仅供参考，不替代医生建议。</view>
+    <view class="small mt">· 你可以随时导出数据，或者注销账号删除全部记录。</view>
+  </view>
+  <view class="card">
+    <view class="between field"><text>健康数据授权</text><text class="muted small">{{me.health_consent ? '已同意' : '未同意'}}</text></view>
+    <view class="between field"><text>病历用药授权</text><text class="muted small">{{me.medical_consent ? '已同意' : '未同意'}}</text></view>
+  </view>
+  <view class="btn ghost mt2" bindtap="deleteAccount">注销账号并删除所有数据</view>
+</view>

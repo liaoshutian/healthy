@@ -1,0 +1,16 @@
+.side-switch { text-align: center; margin-bottom: 12rpx; }
+.doll { position: relative; width: 320rpx; height: 600rpx; margin: 0 auto; }
+.part { position: absolute; background: #EEF2E2; border: 2rpx solid #DCE4C8; box-sizing: border-box; }
+.part.on { background: #A8D85A; border-color: #7DBE3C; }
+.part.circle { border-radius: 50%; }
+.part.round { border-radius: 24rpx; }
+.part.pill { border-radius: 999rpx; }
+.selected { margin-top: 16rpx; }
+.sel { display: flex; align-items: center; padding: 12rpx 0; border-bottom: 1rpx solid #EDF0E2; }
+.x { color: #8A9479; padding: 0 12rpx; }
+.mask { position: fixed; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0, 0, 0, 0.35); z-index: 100; display: flex; align-items: flex-end; }
+.sheet { width: 100%; background: #FFFDF6; border-radius: 32rpx 32rpx 0 0; padding: 32rpx 32rpx calc(32rpx + env(safe-area-inset-bottom)); box-sizing: border-box; }
+.sheet-title { font-size: 32rpx; font-weight: 600; }
+.grid { display: flex; flex-wrap: wrap; gap: 16rpx; }
+.cell { width: calc(33.3% - 12rpx); box-sizing: border-box; padding: 22rpx 8rpx; text-align: center; background: #fff; border-radius: 20rpx; border: 2rpx solid #EDF0E2; font-size: 26rpx; }
+.cell.on { background: #E8F4D6; border-color: #7DBE3C; color: #5E9E2A; }

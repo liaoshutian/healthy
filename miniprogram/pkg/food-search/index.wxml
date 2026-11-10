@@ -1,0 +1,16 @@
+<view class="page">
+  <input class="search" placeholder="搜米饭、鸡翅、奶茶…" focus value="{{q}}" bindinput="onInput" confirm-type="search" />
+  <scroll-view scroll-x class="cats mt">
+    <view wx:for="{{cats}}" wx:key="key" class="chip {{cat === item.key ? 'on' : ''}}" data-key="{{item.key}}" bindtap="pickCat">{{item.label}}</view>
+  </scroll-view>
+  <view class="card mt">
+    <view wx:for="{{list}}" wx:key="id" class="between food" data-index="{{index}}" bindtap="pick">
+      <view>
+        <view>{{item.name}}</view>
+        <view class="tiny muted">1 {{item.unit_name}}约 {{item.unit_grams}} 克 · {{item.kcal_per_unit}} 千卡</view>
+      </view>
+      <text class="add">＋</text>
+    </view>
+    <view wx:if="{{!list.length}}" class="empty">没找到，换个叫法试试</view>
+  </view>
+</view>

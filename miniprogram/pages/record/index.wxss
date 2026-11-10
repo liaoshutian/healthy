@@ -1,0 +1,7 @@
+.grid { display: flex; flex-wrap: wrap; gap: 20rpx; }
+.action { position: relative; width: calc(50% - 10rpx); box-sizing: border-box; background: #fff; border-radius: 28rpx; padding: 28rpx; box-shadow: 0 4rpx 24rpx rgba(94, 158, 42, 0.06); }
+.a-icon { font-size: 56rpx; }
+.a-title { font-size: 30rpx; font-weight: 600; margin-top: 8rpx; }
+.manual { position: absolute; right: 20rpx; top: 24rpx; color: var(--lime-deep); background: var(--lime-soft); padding: 4rpx 14rpx; border-radius: 999rpx; }
+.text-input { background: var(--cream); border-radius: 16rpx; padding: 16rpx 20rpx; }
+.recent { padding: 14rpx 0; border-bottom: 1rpx solid var(--line); }

@@ -1,0 +1,26 @@
+<view class="page">
+  <view class="card">
+    <view class="card-title">哪里不舒服<text class="more">可以多选</text></view>
+    <body-picker parts="{{bodyParts}}" value="{{parts}}" bind:change="onParts" bind:focus="onFocus" />
+    <view wx:if="{{lastHint}}" class="hint small mt">🔁 {{lastHint}}</view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">什么感觉</view>
+    <view class="row wrap">
+      <view wx:for="{{tags}}" wx:key="*this" class="chip {{picked[item] ? 'on' : ''}}" data-v="{{item}}" bindtap="toggleTag">{{item}}</view>
+    </view>
+    <view class="mt">难受程度：{{severity}}/10</view>
+    <slider min="1" max="10" value="{{severity}}" activeColor="#7DBE3C" block-size="22" bindchange="onSeverity" />
+    <view class="field">
+      <text class="label">从什么时候</text>
+      <picker mode="date" value="{{startDate}}" end="{{today}}" bindchange="onDate"><text>{{startDate}}</text></picker>
+      <picker mode="time" value="{{startTime}}" bindchange="onTime"><text class="muted"> {{startTime}}</text></picker>
+    </view>
+    <view class="field"><text class="label">体温</text><input type="digit" placeholder="没量可不填" value="{{temperature}}" bindinput="onTemp" /><text class="muted small">℃</text></view>
+    <textarea class="note" placeholder="想补充的话" value="{{note}}" bindinput="onNote" maxlength="500" auto-height />
+  </view>
+
+  <view class="tiny muted center">这里只做记录和整理，不替代医生诊断</view>
+  <view class="bottom-bar"><view class="btn {{saving ? 'disabled' : ''}}" bindtap="save">记下来</view></view>
+</view>

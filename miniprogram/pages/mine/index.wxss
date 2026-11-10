@@ -1,0 +1,11 @@
+.head { display: flex; align-items: center; gap: 24rpx; }
+.avatar { width: 112rpx; height: 112rpx; border-radius: 50%; background: var(--lime-soft); }
+.name { font-size: 34rpx; font-weight: 600; }
+.tier { padding: 6rpx 20rpx; border-radius: 999rpx; font-size: 22rpx; background: var(--line); color: var(--muted); }
+.tier.pro { background: var(--lime); color: #fff; }
+.tier.max { background: var(--lemon); color: var(--ink); }
+.badge { width: 25%; text-align: center; margin-bottom: 16rpx; }
+.badge.off { opacity: 0.3; filter: grayscale(1); }
+.b-icon { font-size: 52rpx; }
+.list .item { display: flex; justify-content: space-between; align-items: center; padding: 24rpx 0; border-bottom: 1rpx solid var(--line); }
+.list .item:last-child { border-bottom: none; }

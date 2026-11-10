@@ -1,0 +1,6 @@
+.ta { width: 100%; min-height: 160rpx; background: var(--cream); border-radius: 16rpx; padding: 16rpx; box-sizing: border-box; margin-top: 8rpx; }
+.img-wrap { position: relative; }
+.thumb { width: 180rpx; height: 180rpx; border-radius: 16rpx; margin: 12rpx 12rpx 0 0; background: var(--line); display: block; }
+.thumb.add { line-height: 180rpx; text-align: center; font-size: 56rpx; color: var(--muted); }
+.x { position: absolute; right: 16rpx; top: 16rpx; background: rgba(0,0,0,0.5); color: #fff; border-radius: 50%; width: 40rpx; height: 40rpx; text-align: center; line-height: 40rpx; font-size: 22rpx; }
+.page { padding-bottom: 240rpx; }

@@ -1,0 +1,33 @@
+<view class="page">
+  <view class="muted small">{{when}} · {{sourceText}}</view>
+  <view class="card mt">
+    <view wx:for="{{rows}}" wx:key="key" class="metric">
+      <view class="between">
+        <text>{{item.label}}</text>
+        <view>
+          <text class="val">{{item.value}}</text><text class="small muted"> {{item.unit}}</text>
+          <text wx:if="{{item.delta}}" class="small delta"> {{item.delta}}</text>
+        </view>
+      </view>
+      <view wx:if="{{item.level}}" class="bar">
+        <view class="seg {{item.level === 'low' ? 'on' : ''}}">偏低</view>
+        <view class="seg {{item.level === 'normal' ? 'on normal' : ''}}">标准</view>
+        <view class="seg {{item.level === 'high' ? 'on' : ''}}">偏高</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">小柠解读<text class="tag">AI 生成</text></view>
+    <view wx:if="{{ai}}">
+      <view>{{ai.summary}}</view>
+      <view class="mt small" wx:for="{{ai.highlights}}" wx:key="*this">👍 {{item}}</view>
+      <view class="mt small" wx:for="{{ai.next_steps}}" wx:key="*this">🌱 {{item}}</view>
+    </view>
+    <view wx:else class="btn ghost" bindtap="interpret">{{aiLoading ? '小柠在想…' : '让小柠说说'}}</view>
+    <view class="tiny muted mt">仅供参考，不替代医生建议</view>
+  </view>
+
+  <image wx:if="{{d.image_url}}" class="report" src="{{d.image_url}}" mode="widthFix" bindtap="previewImage" />
+  <view class="center muted small mt2" bindtap="remove">删除这条记录</view>
+</view>

@@ -1,0 +1,7 @@
+.r-icon { font-size: 96rpx; }
+.hint { background: #FFF9E0; border-radius: 16rpx; padding: 16rpx; text-align: left; }
+.in { background: var(--cream); border-radius: 16rpx; padding: 16rpx 20rpx; }
+.thumb { width: 140rpx; height: 140rpx; border-radius: 16rpx; margin: 12rpx 12rpx 0 0; background: var(--line); }
+.thumb.add { line-height: 140rpx; text-align: center; color: var(--muted); font-size: 24rpx; }
+.log { display: flex; gap: 20rpx; padding: 16rpx 0; }
+.dot { width: 16rpx; height: 16rpx; border-radius: 50%; background: var(--lime); margin-top: 12rpx; }

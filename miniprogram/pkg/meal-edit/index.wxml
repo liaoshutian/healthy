@@ -1,0 +1,55 @@
+<view class="page">
+  <view wx:if="{{photoUrl}}" class="photo-wrap">
+    <image class="photo" src="{{photoUrl}}" mode="aspectFill" />
+    <block wx:for="{{items}}" wx:key="key">
+      <view wx:if="{{item.x !== null && item.x !== undefined}}" class="pin" style="left:{{item.x * 100}}%;top:{{item.y * 100}}%">{{index + 1}}</view>
+    </block>
+  </view>
+
+  <view class="card">
+    <view class="row wrap">
+      <view wx:for="{{mealTypes}}" wx:key="key" class="chip {{mealType === item.key ? 'on' : ''}}" data-key="{{item.key}}" bindtap="pickType">{{item.label}}</view>
+    </view>
+    <picker mode="date" value="{{date}}" bindchange="pickDate"><view class="small muted">日期：{{date}} ›</view></picker>
+  </view>
+
+  <view class="card">
+    <view class="card-title">识别结果<text class="more">份量不对就拖一拖</text></view>
+    <view wx:if="{{!items.length}}" class="empty">还没有食物，点下面「补一项」</view>
+    <view wx:for="{{items}}" wx:key="key" class="item">
+      <view class="between">
+        <view class="flex1" data-index="{{index}}" bindtap="rename">
+          <text class="num" wx:if="{{photoUrl}}">{{index + 1}}</text>
+          <text class="item-name">{{item.name}}</text>
+          <text wx:if="{{item.estimated}}" class="tag gray">估算</text>
+          <text class="tiny muted"> ✎</text>
+        </view>
+        <text class="muted small" data-index="{{index}}" bindtap="remove">删除</text>
+      </view>
+      <view class="row mt">
+        <view class="step" data-index="{{index}}" data-d="-0.5" bindtap="step">－</view>
+        <view class="flex1 center">
+          <view>{{item.display}}</view>
+          <view class="tiny muted">约 {{item.grams}} 克 · {{item.kcal}} 千卡<text wx:if="{{item.rice_equivalent}}"> · {{item.rice_equivalent}}</text></view>
+        </view>
+        <view class="step" data-index="{{index}}" data-d="0.5" bindtap="step">＋</view>
+      </view>
+    </view>
+    <view class="btn ghost mt" bindtap="addItem">＋ 补一项</view>
+  </view>
+
+  <view class="card" wx:if="{{items.length}}">
+    <view class="center">{{summary.text || '—'}}</view>
+    <view class="tiny muted center mt">约 {{kcal}} 千卡 · 碳水 {{carb}}g · 蛋白质 {{protein}}g · 脂肪 {{fat}}g（估算）</view>
+    <view wx:if="{{score}}" class="score mt {{score.lit ? 'lit' : ''}}">
+      <view>{{score.lit ? '✨ 点亮了' + score.lit_icon_name : '这顿还没点亮' + score.lit_icon_name}}（{{score.plan_name}}）</view>
+      <view wx:if="{{score.tip}}" class="small mt">💡 {{score.tip}}</view>
+      <view wx:if="{{score.locked && !score.lit}}" class="tiny muted mt" bindtap="goMember">想知道怎么换更合适？Pro 会给替换建议 ›</view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <view wx:if="{{id}}" class="btn ghost" bindtap="deleteMeal">删除这顿</view>
+    <view class="btn {{saving || !items.length ? 'disabled' : ''}}" bindtap="save">{{id ? '保存修改' : '记好了'}}</view>
+  </view>
+</view>

@@ -1,0 +1,21 @@
+<view class="page">
+  <view class="card">
+    <view class="btn ghost" bindtap="scan">{{scanning ? '小柠在读药盒…' : '📷 拍药盒，自动读药名'}}</view>
+    <image wx:if="{{photoUrl}}" src="{{photoUrl}}" class="photo mt" mode="aspectFit" />
+    <view wx:if="{{usage}}" class="tiny muted mt">包装上的用法：{{usage}}</view>
+  </view>
+  <view class="card">
+    <view class="field"><text class="label">药名</text><input value="{{form.name}}" placeholder="比如：布洛芬缓释胶囊" data-key="name" bindinput="onField" /></view>
+    <view class="field"><text class="label">规格</text><input value="{{form.spec}}" placeholder="0.3g×24粒" data-key="spec" bindinput="onField" /></view>
+    <view class="field"><text class="label">每次</text><input value="{{form.dose}}" placeholder="1 粒" data-key="dose" bindinput="onField" /></view>
+    <view class="field"><text class="label">每天几次</text><input type="number" value="{{form.times_per_day}}" data-key="times_per_day" bindinput="onField" /></view>
+    <view class="field"><text class="label">吃几天</text><input type="number" value="{{form.course_days}}" placeholder="不确定可不填" data-key="course_days" bindinput="onField" /></view>
+    <picker mode="date" value="{{form.start_date}}" bindchange="onDate"><view class="field"><text class="label">开始日期</text><text class="flex1" style="text-align:right">{{form.start_date}}</text></view></picker>
+    <view class="field"><text class="label">提醒我吃药</text><switch checked="{{form.remind}}" color="#7DBE3C" bindchange="onRemind" /></view>
+  </view>
+  <view class="tiny muted center">小柠只帮你读出药名和规格，不给用药建议，请遵医嘱</view>
+  <view class="bottom-bar">
+    <view wx:if="{{id}}" class="btn ghost" bindtap="remove">删除</view>
+    <view class="btn" bindtap="save">保存</view>
+  </view>
+</view>

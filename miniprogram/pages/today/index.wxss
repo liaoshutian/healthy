@@ -1,0 +1,21 @@
+.streak { text-align: center; background: var(--lime-soft); border-radius: 20rpx; padding: 8rpx 20rpx; }
+.streak-num { font-size: 36rpx; font-weight: 700; color: var(--lime-deep); }
+.lime-card { margin-top: 24rpx; padding-top: 36rpx; }
+.lime-deep { color: var(--lime-deep); font-weight: 600; }
+.petal-row { display: flex; justify-content: space-between; }
+.petal-chip { display: flex; flex-direction: column; align-items: center; width: 100rpx; padding: 8rpx 0; border-radius: 16rpx; opacity: 0.5; }
+.petal-chip.lit { opacity: 1; background: var(--lime-soft); }
+.portion-row { display: flex; justify-content: space-between; }
+.portion { text-align: center; width: 120rpx; }
+.portion.empty-p { opacity: 0.35; }
+.p-icon { font-size: 52rpx; }
+.challenge { background: var(--lime-soft); border-radius: 16rpx; padding: 14rpx 20rpx; color: var(--lime-deep); }
+.meal-row { display: flex; padding: 18rpx 0; border-bottom: 1rpx solid var(--line); }
+.meal-row:last-child { border-bottom: none; }
+.meal-label { width: 100rpx; color: var(--muted); }
+.meal-log { margin-bottom: 8rpx; }
+.routine-scroll { white-space: nowrap; }
+.routine-card { display: inline-block; width: 200rpx; margin-right: 20rpx; padding: 20rpx; border-radius: 20rpx; background: var(--cream); text-align: center; vertical-align: top; white-space: normal; }
+.routine-card.overdue, .routine-card.due { background: #FFF3C4; }
+.r-icon { font-size: 48rpx; }
+.hint { background: #FFF9E0; }

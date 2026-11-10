@@ -1,0 +1,45 @@
+<view class="picker">
+  <view class="side-switch">
+    <view class="chip {{side === 'front' ? 'on' : ''}}" data-side="front" bindtap="switchSide">正面</view>
+    <view class="chip {{side === 'back' ? 'on' : ''}}" data-side="back" bindtap="switchSide">背面</view>
+  </view>
+
+  <view class="doll">
+    <block wx:for="{{regions}}" wx:key="id">
+    <view wx:if="{{item.side === 'both' || item.side === side}}"
+      class="part {{item.shape}} {{selectedTop[item.code] ? 'on' : ''}}"
+      style="left:{{item.x}}rpx;top:{{item.y}}rpx;width:{{item.w}}rpx;height:{{item.h}}rpx"
+      data-code="{{item.code}}" bindtap="openTop"></view>
+    </block>
+  </view>
+
+  <view class="row wrap mt">
+    <view class="chip" data-code="skin" bindtap="openTop">皮肤（全身）</view>
+    <view class="chip" data-code="whole" bindtap="openTop">全身/说不清</view>
+  </view>
+
+  <view class="selected" wx:if="{{value.length}}">
+    <view wx:for="{{value}}" wx:key="code" class="sel">
+      <text class="flex1">📍 {{item.label}}</text>
+      <text class="x" data-index="{{index}}" bindtap="remove">✕</text>
+    </view>
+  </view>
+
+  <!-- 放大的局部图：最多三级 -->
+  <view class="mask" wx:if="{{zoom}}" bindtap="closeZoom">
+    <view class="sheet" catchtap="noop">
+      <view class="between">
+        <text class="sheet-title">{{zoomTrail}}</text>
+        <text class="muted small" bindtap="closeZoom">关闭</text>
+      </view>
+      <view class="muted small mt">点一个更细的位置，或者直接选整个部位</view>
+      <view class="grid mt">
+        <view wx:for="{{zoomChildren}}" wx:key="code" class="cell {{selectedCodes[item.code] ? 'on' : ''}}" data-index="{{index}}" bindtap="pickChild">
+          {{item.label}}<text wx:if="{{item.children}}" class="muted"> ›</text>
+        </view>
+      </view>
+      <view class="btn ghost mt2" bindtap="pickWhole">就选「{{zoom.label}}」</view>
+      <view wx:if="{{zoomStack.length > 1}}" class="center muted small mt" bindtap="zoomBack">‹ 返回上一级</view>
+    </view>
+  </view>
+</view>
