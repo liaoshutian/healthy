@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+backend/dev.db
+backend/uploads/
+backend/.env
+deploy/.env
+deploy/certs/
+deploy/backups/
+node_modules/
+miniprogram/miniprogram_npm/
+project.private.config.json
+.DS_Store
