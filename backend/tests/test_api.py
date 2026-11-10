@@ -339,3 +339,27 @@ def test_reasoning_models_skip_temperature(monkeypatch):
     chat_json(Provider("openai", "https://relay.test/v1", "k", "gpt-4.1", True), "s", "u")
     assert bodies[0]["reasoning_effort"] == "low" and "temperature" not in bodies[0]
     assert bodies[1]["temperature"] == 0.1 and "reasoning_effort" not in bodies[1]
+
+
+def test_medication_reminder_uses_routine_template(client, auth, monkeypatch):
+    """吃药提醒和规律小事共用 WX_TMPL_ROUTINE 一个模板。"""
+    from datetime import datetime
+
+    from app import worker
+    from app.config import get_settings
+    from app.db import SessionLocal
+
+    sent = []
+    monkeypatch.setattr(get_settings(), "wx_tmpl_routine", "TMPL_X")
+    monkeypatch.setattr(worker, "send_subscribe_message", lambda *a: sent.append(a) or True)
+    monkeypatch.setattr(clock, "now", lambda: datetime(2026, 1, 1, 9, tzinfo=clock.TZ))
+    client.post("/api/me/consent", headers=auth, json={"kind": "medical"})
+    m = client.post("/api/medications", headers=auth, json={"name": "布洛芬缓释胶囊", "dose": "1 粒", "times_per_day": 2,
+                                                            "course_days": 3, "start_date": str(clock.today()), "remind": True}).json()
+    client.post(f"/api/medications/{m['id']}/subscribed", headers=auth, json={"accepted": 1})
+    with SessionLocal() as db:
+        assert worker.medication_reminders(db) == 1
+    _, tmpl, _, data = sent[0]
+    assert tmpl == "TMPL_X" and set(data) == {"time1", "thing2"}
+    assert data["thing2"].startswith("吃药：布洛芬") and len(data["thing2"]) <= 20
+    assert data["time1"].endswith(" 09:00")
