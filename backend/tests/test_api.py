@@ -290,14 +290,13 @@ def test_openai_only_via_relay(monkeypatch):
 def test_every_ai_endpoint_checks_tier_and_quota(client, auth, fake_ai):
     """所有调用大模型的接口都在后台过鉴权 + 等级 + 配额。"""
     responses, calls = fake_ai
-    responses["deepseek"] = {"items": [{"name": "牛肉面", "grams": 500, "count": 1, "unit": "碗"}]}
-    responses["openai"] = INBODY_AI
+    responses["openai"] = {"items": [{"name": "牛肉面", "grams": 500, "count": 1, "unit": "碗"}]}
     # 没登录一律 401
     assert client.post("/api/meals/parse-text", json={"text": "一碗牛肉面"}).status_code == 401
     # Pro（试用）可以解读，有每日上限
     client.post("/api/me/consent", headers=auth, json={"kind": "health"})
     rid = client.post("/api/body", headers=auth, json={"weight_kg": 70, "source": "weight"}).json()["id"]
-    responses["deepseek"] = {"summary": "保持得不错", "next_steps": ["多走走"]}
+    responses["openai"] = {"summary": "保持得不错", "next_steps": ["多走走"]}
     for _ in range(quota.limit_for("interpret", "pro")):
         assert client.post(f"/api/body/{rid}/interpret", headers=auth).status_code == 200
     n = len(calls)
@@ -307,7 +306,7 @@ def test_every_ai_endpoint_checks_tier_and_quota(client, auth, fake_ai):
     downgrade_to_free(client, auth)
     assert client.post(f"/api/body/{rid}/interpret", headers=auth).status_code == 402
     assert "interpret" not in [q["feature"] for q in client.get("/api/me", headers=auth).json()["quotas"]]
-    responses["deepseek"] = {"items": [{"name": "牛肉面", "grams": 500, "count": 1, "unit": "碗"}]}
+    responses["openai"] = {"items": [{"name": "牛肉面", "grams": 500, "count": 1, "unit": "碗"}]}
     for _ in range(10):
         assert "items" in client.post("/api/meals/parse-text", headers=auth, json={"text": "一碗牛肉面"}).json()
     d = client.post("/api/meals/parse-text", headers=auth, json={"text": "一碗牛肉面"}).json()
@@ -363,3 +362,18 @@ def test_medication_reminder_uses_routine_template(client, auth, monkeypatch):
     assert tmpl == "TMPL_X" and set(data) == {"time1", "thing2"}
     assert data["thing2"].startswith("吃药：布洛芬") and len(data["thing2"]) <= 20
     assert data["time1"].endswith(" 09:00")
+
+
+def test_text_uses_openai_first_then_deepseek(client, auth, fake_ai, monkeypatch):
+    from app.config import get_settings
+    from app.services.ai.client import AIError, text_providers
+
+    assert [p.name for p in text_providers()] == ["openai", "deepseek"]
+    responses, calls = fake_ai
+    responses["openai"] = AIError("relay down")
+    responses["deepseek"] = {"items": [{"name": "牛肉面", "grams": 500, "count": 1, "unit": "碗"}]}
+    assert "items" in client.post("/api/meals/parse-text", headers=auth, json={"text": "一碗牛肉面"}).json()
+    assert calls[-2:] == ["openai", "deepseek"]
+    # 没配中转地址时只用 DeepSeek
+    monkeypatch.setattr(get_settings(), "openai_base_url", "")
+    assert [p.name for p in text_providers()] == ["deepseek"]

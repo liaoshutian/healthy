@@ -29,12 +29,12 @@ class Settings(BaseSettings):
     local_storage_dir: str = "./uploads"
     public_base_url: str = "http://localhost:8000"
 
-    # 大模型：看图主模型 ChatGPT，备用通义千问 VL；文字用 DeepSeek
+    # 大模型：主模型都是 ChatGPT；看图备用通义千问 VL，文字备用 DeepSeek
     openai_api_key: str = ""
     # 不直连 OpenAI，必须填自己服务器上的中转地址（OpenAI 兼容接口，如 https://relay.example.com/v1）；留空则不调用 ChatGPT
     openai_base_url: str = ""
     openai_vision_model: str = "gpt-6.1-terra"
-    openai_text_model: str = "gpt-6.1-terra"  # DeepSeek 失败时的文字兜底
+    openai_text_model: str = "gpt-6.1-terra"  # 文字主模型，失败切 DeepSeek
     # 推理强度：GPT-5 及以后的模型用（none/low/medium/high）；留空则按老模型传 temperature
     openai_reasoning_effort: str = "low"
     qwen_api_key: str = ""
