@@ -19,6 +19,11 @@ log = logging.getLogger("worker")
 SEND_HOURS = range(9, 21)  # 只在白天发
 
 
+def reminder_data(day, note: str) -> dict[str, str]:
+    """“日程提醒”模板（编号 46076）：time1=日程时间，thing2=备注（最多 20 字）。规律小事和吃药提醒共用。"""
+    return {"time1": f"{day.year}年{day.month}月{day.day}日 09:00", "thing2": note[:20]}
+
+
 def routine_reminders(db) -> int:
     s = get_settings()
     if not s.wx_tmpl_routine:
@@ -32,9 +37,8 @@ def routine_reminders(db) -> int:
             continue
         days_left = (due - today).days
         tip = "今天就是计划的日子" if days_left == 0 else (f"还有 {days_left} 天" if days_left > 0 else "已经到时间啦")
-        # 模板字段名需与小程序后台申请的模板一致：thing1=事项名称，date2=计划日期，thing3=温馨提示
         ok = send_subscribe_message(u.openid, s.wx_tmpl_routine, f"pages/routine/index?id={r.id}",
-                                    {"thing1": r.name[:20], "date2": due.isoformat(), "thing3": f"{tip}，小柠提醒你"[:20]})
+                                    reminder_data(due, f"{r.name}：{tip}"))
         r.last_reminded_for = due
         r.reminder_credits = max(0, r.reminder_credits - 1)
         sent += int(ok)
@@ -44,7 +48,7 @@ def routine_reminders(db) -> int:
 
 def medication_reminders(db) -> int:
     s = get_settings()
-    if not s.wx_tmpl_medication:
+    if not s.wx_tmpl_routine:
         return 0
     today = clock.today()
     sent = 0
@@ -56,9 +60,9 @@ def medication_reminders(db) -> int:
         # 每天只在 9 点那一轮发一条
         if clock.now().hour != 9:
             continue
-        ok = send_subscribe_message(u.openid, s.wx_tmpl_medication, "pages/record/index",
-                                    {"thing1": m.name[:20], "thing2": f"每次{m.dose or ''}，每天{m.times_per_day or ''}次"[:20],
-                                     "thing3": "记得按时吃药，早日好起来"})
+        dose = f" 每次{m.dose}" if m.dose else ""
+        ok = send_subscribe_message(u.openid, s.wx_tmpl_routine, "pages/record/index",
+                                    reminder_data(today, f"吃药：{m.name}{dose}"))
         m.reminder_credits = max(0, m.reminder_credits - 1)
         sent += int(ok)
     db.commit()

@@ -20,7 +20,6 @@ class Settings(BaseSettings):
     wx_secret: str = ""
     # 订阅消息模板 ID（在小程序后台申请后填写）
     wx_tmpl_routine: str = ""
-    wx_tmpl_medication: str = ""
     wx_miniprogram_state: str = "formal"  # developer / trial / formal
 
     # 管理后台

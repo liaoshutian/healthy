@@ -1,5 +1,5 @@
 import { del, get, post, put, showError, uploadImage } from '../../utils/api'
-import { TMPL_MEDICATION } from '../../utils/config'
+import { TMPL_ROUTINE } from '../../utils/config'
 import { askSubscribe, chooseImage, ymd } from '../../utils/util'
 
 Page({
@@ -78,7 +78,7 @@ Page({
     try {
       const m = this.data.id ? await put(`/api/medications/${this.data.id}`, body) : await post('/api/medications', body)
       if (body.remind) {
-        const accepted = await askSubscribe(TMPL_MEDICATION)
+        const accepted = await askSubscribe(TMPL_ROUTINE)
         if (accepted) await post(`/api/medications/${m.id}/subscribed`, { accepted })
       }
       wx.navigateBack()

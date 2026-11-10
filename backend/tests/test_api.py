@@ -320,3 +320,27 @@ def test_unlimited_tier_still_has_hard_cap():
     for _ in range(quota.HARD_CAP["day"]):
         assert quota.try_consume("food", 1, "max", date(2026, 1, 1))
     assert not quota.try_consume("food", 1, "max", date(2026, 1, 1))
+
+
+def test_medication_reminder_uses_routine_template(client, auth, monkeypatch):
+    """吃药提醒和规律小事共用 WX_TMPL_ROUTINE 一个模板。"""
+    from datetime import datetime
+
+    from app import worker
+    from app.config import get_settings
+    from app.db import SessionLocal
+
+    sent = []
+    monkeypatch.setattr(get_settings(), "wx_tmpl_routine", "TMPL_X")
+    monkeypatch.setattr(worker, "send_subscribe_message", lambda *a: sent.append(a) or True)
+    monkeypatch.setattr(clock, "now", lambda: datetime(2026, 1, 1, 9, tzinfo=clock.TZ))
+    client.post("/api/me/consent", headers=auth, json={"kind": "medical"})
+    m = client.post("/api/medications", headers=auth, json={"name": "布洛芬缓释胶囊", "dose": "1 粒", "times_per_day": 2,
+                                                            "course_days": 3, "start_date": str(clock.today()), "remind": True}).json()
+    client.post(f"/api/medications/{m['id']}/subscribed", headers=auth, json={"accepted": 1})
+    with SessionLocal() as db:
+        assert worker.medication_reminders(db) == 1
+    _, tmpl, _, data = sent[0]
+    assert tmpl == "TMPL_X" and set(data) == {"time1", "thing2"}
+    assert data["thing2"].startswith("吃药：布洛芬") and len(data["thing2"]) <= 20
+    assert data["time1"].endswith(" 09:00")
