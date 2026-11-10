@@ -1,0 +1,9 @@
+.metric { padding: 18rpx 0; border-bottom: 1rpx solid var(--line); }
+.metric:last-child { border-bottom: none; }
+.val { font-size: 34rpx; font-weight: 600; }
+.delta { color: var(--muted); }
+.bar { display: flex; margin-top: 10rpx; gap: 6rpx; }
+.seg { flex: 1; text-align: center; font-size: 20rpx; padding: 4rpx 0; background: var(--line); color: var(--muted); border-radius: 8rpx; }
+.seg.on { background: #FFE2B8; color: #9A5B10; }
+.seg.on.normal { background: var(--lime); color: #fff; }
+.report { width: 100%; border-radius: 20rpx; }

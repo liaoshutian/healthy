@@ -1,0 +1,12 @@
+.head { background: linear-gradient(135deg, #A8D85A, #7DBE3C); color: #fff; }
+.head .muted { color: rgba(255,255,255,0.8); }
+.copy { text-decoration: underline; margin-left: 12rpx; }
+.code { background: var(--cream); border-radius: 16rpx; padding: 16rpx 20rpx; letter-spacing: 4rpx; }
+.q { padding: 10rpx 0; }
+.table { font-size: 22rpx; }
+.tr { display: flex; border-bottom: 1rpx solid var(--line); }
+.tr.th { font-weight: 600; font-size: 26rpx; }
+.tr.hl { background: #FFF9E0; }
+.td { flex: 1; padding: 16rpx 6rpx; text-align: center; white-space: pre-line; }
+.td.first { flex: 1.2; text-align: left; color: var(--muted); }
+.td.cur { color: var(--lime-deep); }

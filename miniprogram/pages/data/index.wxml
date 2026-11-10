@@ -1,0 +1,65 @@
+<view class="page">
+  <view class="seg">
+    <view class="seg-item {{tab === 'calendar' ? 'on' : ''}}" data-tab="calendar" bindtap="switchTab">日历</view>
+    <view class="seg-item {{tab === 'trend' ? 'on' : ''}}" data-tab="trend" bindtap="switchTab">趋势</view>
+  </view>
+
+  <view wx:if="{{tab === 'calendar'}}">
+    <view class="card">
+      <view class="between">
+        <text class="nav" bindtap="prevMonth">‹</text>
+        <text class="card-title" style="margin:0">{{year}} 年 {{month}} 月</text>
+        <text class="nav" bindtap="nextMonth">›</text>
+      </view>
+      <view class="week mt">
+        <text wx:for="{{['一','二','三','四','五','六','日']}}" wx:key="*this">{{item}}</text>
+      </view>
+      <view class="grid">
+        <view wx:for="{{cells}}" wx:key="key" class="cell {{item.today ? 'today' : ''}} {{item.date ? '' : 'blank'}}" data-date="{{item.date}}" bindtap="openDay">
+          <text class="num">{{item.day}}</text>
+          <view class="dots">
+            <text wx:if="{{item.meals}}" class="dot green"></text>
+            <text wx:if="{{item.body}}" class="dot blue"></text>
+            <text wx:if="{{item.routine}}" class="mini">{{item.routine}}</text>
+            <text wx:if="{{item.sick}}" class="mini">💊</text>
+          </view>
+        </view>
+      </view>
+      <view class="legend tiny muted mt">
+        <text><text class="dot green"></text> 记了饭</text>
+        <text><text class="dot blue"></text> 身体数据</text>
+        <text>⏰ 规律小事</text>
+        <text>💊 生病/吃药</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else>
+    <view class="card">
+      <scroll-view scroll-x class="chips">
+        <view wx:for="{{metrics}}" wx:key="key" class="chip {{metric === item.key ? 'on' : ''}}" data-key="{{item.key}}" bindtap="pickMetric">{{item.label}}</view>
+      </scroll-view>
+      <view class="row mt">
+        <view wx:for="{{ranges}}" wx:key="key" class="chip {{range === item.key ? 'on' : ''}}" data-key="{{item.key}}" bindtap="pickRange">{{item.label}}</view>
+      </view>
+      <line-chart points="{{trend.points}}" average="{{trend.moving_avg_7d}}" unit="{{trend.unit}}" />
+      <view class="center mt" wx:if="{{trend.summary}}">{{trend.summary}}</view>
+      <view class="tiny muted center mt">浅色点是每次记录，深色线是 7 天平均，更能看出趋势</view>
+      <view class="tiny soft-orange center mt" wx:if="{{trend.limited_to_90_days}}" bindtap="goMember">免费版看最近 90 天，Pro 可以看全部 ›</view>
+    </view>
+  </view>
+
+  <!-- 某天的明细 -->
+  <view class="mask" wx:if="{{day}}" bindtap="closeDay">
+    <view class="sheet" catchtap="noop">
+      <view class="card-title">{{dayTitle}}</view>
+      <view wx:if="{{day.food.text}}" class="small">🍽 {{day.food.text}}</view>
+      <view wx:for="{{day.meals}}" wx:key="id" class="small muted" data-id="{{item.id}}" bindtap="openMeal">· {{item.title}}</view>
+      <view wx:if="{{day.water}}" class="small mt">💧 喝了 {{day.water}} 杯水</view>
+      <view wx:for="{{day.body}}" wx:key="id" class="small mt">⚖️ 体重 {{item.weight_kg || '-'}} kg<text wx:if="{{item.body_fat_pct}}"> · 体脂 {{item.body_fat_pct}}%</text></view>
+      <view wx:for="{{day.routines}}" wx:key="name" class="small mt">{{item.icon}} {{item.name}}<text wx:if="{{item.note}}" class="muted"> · {{item.note}}</text></view>
+      <view wx:for="{{day.symptom_updates}}" wx:key="symptom_id" class="small mt">🩹 不适程度 {{item.severity}}/10</view>
+      <view wx:if="{{dayEmpty}}" class="empty">这天没有记录，休息也很好</view>
+    </view>
+  </view>
+</view>

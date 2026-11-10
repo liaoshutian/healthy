@@ -1,0 +1,49 @@
+<view class="page">
+  <view class="card head" bindtap="goProfile">
+    <image class="avatar" src="{{me.avatar_url || '/assets/avatar.png'}}" mode="aspectFill" />
+    <view class="flex1">
+      <view class="name">{{me.nickname || '青柠朋友'}}</view>
+      <view class="tiny muted">会员 ID：{{me.member_id}}</view>
+    </view>
+    <view class="tier {{me.tier}}">{{tierName}}</view>
+  </view>
+
+  <view class="card" bindtap="goMember">
+    <view class="between">
+      <view>
+        <view>{{me.tier === 'free' ? '开通 Pro，记得更轻松' : tierName + ' 会员'}}</view>
+        <view class="tiny muted" wx:if="{{me.tier_end_at}}">到期：{{endText}}</view>
+      </view>
+      <text class="muted">›</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">我的挑战</view>
+    <view wx:if="{{challenge}}" class="between">
+      <view>{{challenge.plan.icon}} {{challenge.plan.name}} · 第 {{challenge.day_n}}/{{challenge.days}} 天</view>
+      <view class="btn small ghost" bindtap="goPlans">换一张</view>
+    </view>
+    <view wx:else class="between">
+      <view class="muted small">现在只是随便记记，也很好</view>
+      <view class="btn small ghost" bindtap="goPlans">挑一张卡</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="card-title">徽章墙<text class="more" bindtap="goBadges">全部 ›</text></view>
+    <view class="row wrap">
+      <view wx:for="{{badges}}" wx:key="code" class="badge {{item.got ? '' : 'off'}}">
+        <view class="b-icon">{{item.icon}}</view>
+        <view class="tiny">{{item.name}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card list">
+    <view class="item" bindtap="goProfile">基本信息<text class="muted">›</text></view>
+    <view class="item" bindtap="goSymptoms">不适与用药记录<text class="muted">›</text></view>
+    <view class="item" bindtap="exportData">导出数据<text class="tag">Pro</text><text class="muted">›</text></view>
+    <view class="item" bindtap="goPrivacy">隐私与注销账号<text class="muted">›</text></view>
+  </view>
+</view>

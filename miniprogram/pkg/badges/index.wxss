@@ -1,0 +1,4 @@
+.grid { display: flex; flex-wrap: wrap; gap: 20rpx; }
+.badge { width: calc(33.3% - 14rpx); box-sizing: border-box; background: #fff; border-radius: 24rpx; padding: 24rpx 12rpx; text-align: center; }
+.badge.off { opacity: 0.35; filter: grayscale(1); }
+.b-icon { font-size: 72rpx; }

@@ -1,0 +1,5 @@
+.frame { margin-top: 40rpx; border: 4rpx dashed var(--pulp); border-radius: 32rpx; padding: 120rpx 40rpx; background: #fff; }
+.frame-icon { font-size: 120rpx; }
+.preview { width: 100%; height: 600rpx; border-radius: 28rpx; }
+.spinner { font-size: 64rpx; animation: spin 1.2s linear infinite; display: inline-block; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

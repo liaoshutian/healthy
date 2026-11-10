@@ -1,0 +1,20 @@
+<view class="page">
+  <view class="card">
+    <view class="field"><text class="label">名称</text><input value="{{form.name}}" placeholder="比如：理发" data-key="name" bindinput="onField" maxlength="16" /></view>
+    <view class="field"><text class="label">图标</text>
+      <scroll-view scroll-x class="icons flex1">
+        <text wx:for="{{icons}}" wx:key="*this" class="icon {{form.icon === item ? 'on' : ''}}" data-v="{{item}}" bindtap="pickIcon">{{item}}</text>
+      </scroll-view>
+    </view>
+    <view class="field"><text class="label">每隔几天</text><input type="number" value="{{form.cycle_days}}" data-key="cycle_days" bindinput="onField" /><text class="muted small">天</text></view>
+    <view class="field"><text class="label">提前提醒</text><input type="number" value="{{form.remind_days_before}}" data-key="remind_days_before" bindinput="onField" /><text class="muted small">天</text></view>
+    <picker mode="date" value="{{form.last_done_date}}" end="{{today}}" bindchange="pickDate">
+      <view class="field"><text class="label">上次是哪天</text><text class="flex1" style="text-align:right">{{form.last_done_date || '记不清就从今天算'}}</text></view>
+    </picker>
+  </view>
+  <view class="row gap">
+    <view class="btn ghost flex1" bindtap="addCalendar">写进手机日历</view>
+    <view class="btn flex1 {{saving ? 'disabled' : ''}}" bindtap="save">保存</view>
+  </view>
+  <view class="tiny muted mt center">保存时会问你要不要“到时间提醒我”，每允许一次就能提醒一次</view>
+</view>

@@ -1,0 +1,59 @@
+<view class="page">
+  <view class="dots center"><text wx:for="{{[0,1,2,3]}}" wx:key="*this" class="d {{step === item ? 'on' : ''}}"></text></view>
+
+  <view wx:if="{{step === 0}}" class="center">
+    <swiper class="intro" indicator-dots autoplay circular indicator-active-color="#7DBE3C">
+      <swiper-item wx:for="{{intro}}" wx:key="title">
+        <view class="intro-card">
+          <view class="intro-icon">{{item.icon}}</view>
+          <view class="big">{{item.title}}</view>
+          <view class="muted mt">{{item.desc}}</view>
+        </view>
+      </swiper-item>
+    </swiper>
+    <view class="btn mt2" bindtap="next">开始</view>
+  </view>
+
+  <view wx:if="{{step === 1}}">
+    <view class="big">先认识一下</view>
+    <view class="muted small">都可以跳过，以后在「我的」里补</view>
+    <view class="card mt">
+      <view class="field"><text class="label">性别</text>
+        <view class="flex1" style="text-align:right">
+          <text class="chip {{gender === 'female' ? 'on' : ''}}" data-v="female" bindtap="pickGender">女</text>
+          <text class="chip {{gender === 'male' ? 'on' : ''}}" data-v="male" bindtap="pickGender">男</text>
+        </view>
+      </view>
+      <picker mode="date" value="{{birthday}}" start="1930-01-01" end="2020-12-31" bindchange="pickBirthday">
+        <view class="field"><text class="label">生日</text><text class="flex1" style="text-align:right">{{birthday || '选一下'}}</text></view>
+      </picker>
+      <picker range="{{heights}}" value="{{heightIndex}}" bindchange="pickHeight">
+        <view class="field"><text class="label">身高</text><text class="flex1" style="text-align:right">{{heights[heightIndex]}} cm</text></view>
+      </picker>
+    </view>
+    <view class="hint small" bindtap="goInbody">📄 有 InBody 报告？直接拍一张，身高体重都能自动读出来 ›</view>
+    <view class="row gap mt2"><view class="btn ghost flex1" bindtap="next">跳过</view><view class="btn flex1" bindtap="saveBasic">下一步</view></view>
+  </view>
+
+  <view wx:if="{{step === 2}}">
+    <view class="big">你想怎么玩？</view>
+    <view class="play-card {{play === 'casual' ? 'on' : ''}}" data-v="casual" bindtap="pickPlay">
+      <view class="play-icon">🍋</view>
+      <view class="flex1"><view class="play-title">先随便记记</view><view class="small muted">不设任何目标，想记就记</view></view>
+    </view>
+    <view class="play-card {{play === 'challenge' ? 'on' : ''}}" data-v="challenge" bindtap="pickPlay">
+      <view class="play-icon">🃏</view>
+      <view class="flex1"><view class="play-title">挑一个挑战</view><view class="small muted">把喜欢的饮食方案当成一张卡来玩，随时可以换</view></view>
+    </view>
+    <view class="btn mt2" bindtap="next">下一步</view>
+  </view>
+
+  <view wx:if="{{step === 3}}">
+    <view class="big">想顺手管的小事</view>
+    <view class="muted small">到时间了小柠提醒你，不用每天打卡</view>
+    <view class="row wrap mt">
+      <view wx:for="{{templates}}" wx:key="name" class="chip {{picked[index] ? 'on' : ''}}" data-index="{{index}}" bindtap="pickTemplate">{{item.icon}} {{item.name}}</view>
+    </view>
+    <view class="row gap mt2"><view class="btn ghost flex1" bindtap="finish">跳过</view><view class="btn flex1" bindtap="saveRoutines">好了</view></view>
+  </view>
+</view>

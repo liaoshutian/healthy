@@ -1,0 +1,57 @@
+{
+  "pages": [
+    "pages/today/index",
+    "pages/data/index",
+    "pages/record/index",
+    "pages/routine/index",
+    "pages/mine/index"
+  ],
+  "subPackages": [
+    {
+      "root": "pkg",
+      "pages": [
+        "onboarding/index",
+        "meal-photo/index",
+        "meal-edit/index",
+        "food-search/index",
+        "body-edit/index",
+        "body-detail/index",
+        "routine-edit/index",
+        "routine-detail/index",
+        "symptom-edit/index",
+        "symptom-detail/index",
+        "medication-edit/index",
+        "medical-edit/index",
+        "plans/index",
+        "member/index",
+        "profile/index",
+        "badges/index",
+        "privacy/index"
+      ]
+    }
+  ],
+  "tabBar": {
+    "custom": true,
+    "color": "#8A9479",
+    "selectedColor": "#5E9E2A",
+    "backgroundColor": "#FFFDF6",
+    "list": [
+      { "pagePath": "pages/today/index", "text": "今日" },
+      { "pagePath": "pages/data/index", "text": "数据" },
+      { "pagePath": "pages/record/index", "text": "记一下" },
+      { "pagePath": "pages/routine/index", "text": "规律" },
+      { "pagePath": "pages/mine/index", "text": "我的" }
+    ]
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#FFFDF6",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "青柠生活",
+    "backgroundColor": "#FFFDF6"
+  },
+  "usingComponents": {},
+  "requiredPrivateInfos": [],
+  "lazyCodeLoading": "requiredComponents",
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

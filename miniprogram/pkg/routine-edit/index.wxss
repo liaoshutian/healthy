@@ -1,0 +1,3 @@
+.icons { white-space: nowrap; text-align: right; }
+.icon { display: inline-block; font-size: 44rpx; padding: 6rpx 10rpx; border-radius: 12rpx; }
+.icon.on { background: var(--lime-soft); }

@@ -1,0 +1,62 @@
+/* 青柠生活：青柠绿主色，柠檬黄和果肉浅黄绿做辅助，奶白背景。不用红色警告。 */
+page {
+  --lime: #7DBE3C;
+  --lime-deep: #5E9E2A;
+  --lime-soft: #E8F4D6;
+  --pulp: #DDEFB0;
+  --lemon: #F7D94C;
+  --cream: #FFFDF6;
+  --ink: #2F3A24;
+  --muted: #8A9479;
+  --line: #EDF0E2;
+  --orange: #F2A65A;
+  --sky: #6CB4D9;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 28rpx;
+  line-height: 1.55;
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+}
+
+.page { padding: 24rpx 32rpx 200rpx; box-sizing: border-box; }
+.card { background: #fff; border-radius: 28rpx; padding: 28rpx; margin-bottom: 24rpx; box-shadow: 0 4rpx 24rpx rgba(94, 158, 42, 0.06); }
+.card-title { font-size: 30rpx; font-weight: 600; margin-bottom: 16rpx; display: flex; justify-content: space-between; align-items: center; }
+.card-title .more { font-size: 24rpx; color: var(--muted); font-weight: normal; }
+.row { display: flex; align-items: center; }
+.between { display: flex; align-items: center; justify-content: space-between; }
+.wrap { flex-wrap: wrap; }
+.gap { gap: 16rpx; }
+.flex1 { flex: 1; min-width: 0; }
+.muted { color: var(--muted); }
+.small { font-size: 24rpx; }
+.tiny { font-size: 22rpx; }
+.big { font-size: 40rpx; font-weight: 600; }
+.center { text-align: center; }
+.mt { margin-top: 16rpx; }
+.mt2 { margin-top: 32rpx; }
+.soft-orange { color: var(--orange); }
+.ellipsis { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.btn { background: var(--lime); color: #fff; border-radius: 999rpx; padding: 22rpx 0; text-align: center; font-size: 30rpx; font-weight: 600; }
+.btn.ghost { background: var(--lime-soft); color: var(--lime-deep); }
+.btn.small { display: inline-block; padding: 10rpx 28rpx; font-size: 24rpx; }
+.btn[disabled], .btn.disabled { opacity: 0.5; }
+button.btn { margin: 0; line-height: 1.5; border: none; }
+button.btn::after { border: none; }
+
+.chip { display: inline-block; padding: 8rpx 24rpx; border-radius: 999rpx; background: var(--line); color: var(--ink); font-size: 24rpx; margin: 0 12rpx 12rpx 0; }
+.chip.on { background: var(--lime); color: #fff; }
+
+.field { display: flex; align-items: center; padding: 22rpx 0; border-bottom: 1rpx solid var(--line); }
+.field:last-child { border-bottom: none; }
+.field .label { width: 200rpx; color: var(--muted); }
+.field input, .field picker { flex: 1; text-align: right; }
+.field.low { background: #FFF6D6; margin: 0 -28rpx; padding-left: 28rpx; padding-right: 28rpx; }
+
+.empty { text-align: center; color: var(--muted); padding: 40rpx 0; }
+.tag { display: inline-block; font-size: 20rpx; padding: 2rpx 12rpx; border-radius: 8rpx; background: var(--lime-soft); color: var(--lime-deep); margin-left: 8rpx; }
+.tag.yellow { background: #FFF3C4; color: #A07C00; }
+.tag.gray { background: var(--line); color: var(--muted); }
+
+.bottom-bar { position: fixed; left: 0; right: 0; bottom: 0; padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom)); background: rgba(255, 253, 246, 0.96); box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.04); display: flex; gap: 20rpx; z-index: 10; }
+.bottom-bar .btn { flex: 1; }

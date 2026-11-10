@@ -1,0 +1,11 @@
+.dots { margin-bottom: 32rpx; }
+.d { display: inline-block; width: 14rpx; height: 14rpx; border-radius: 50%; background: var(--line); margin: 0 6rpx; }
+.d.on { background: var(--lime); width: 36rpx; border-radius: 999rpx; }
+.intro { height: 640rpx; }
+.intro-card { padding: 80rpx 40rpx; }
+.intro-icon { font-size: 160rpx; }
+.hint { background: #FFF9E0; padding: 20rpx; border-radius: 20rpx; }
+.play-card { display: flex; align-items: center; gap: 24rpx; background: #fff; border: 4rpx solid transparent; border-radius: 28rpx; padding: 36rpx 28rpx; margin-top: 24rpx; }
+.play-card.on { border-color: var(--lime); background: var(--lime-soft); }
+.play-icon { font-size: 72rpx; }
+.play-title { font-size: 32rpx; font-weight: 600; }

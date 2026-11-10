@@ -1,0 +1,21 @@
+<view class="page">
+  <view wx:if="{{!photo}}" class="center">
+    <view class="frame">
+      <view class="frame-icon">🍽️</view>
+      <view class="muted">俯拍更准</view>
+      <view class="muted small">旁边放一双筷子或勺子当参照，份量估得更好</view>
+    </view>
+    <view class="btn mt2" bindtap="shoot">拍照</view>
+    <view class="btn ghost mt" bindtap="album">从相册选</view>
+    <view class="muted small mt2" bindtap="manual">不想拍？手动记一下 ›</view>
+  </view>
+
+  <view wx:else class="center">
+    <image class="preview" src="{{photo}}" mode="aspectFill" />
+    <view class="mt2" wx:if="{{loading}}">
+      <view class="spinner">🍋</view>
+      <view class="muted">小柠正在看这顿饭…</view>
+      <view class="tiny muted">一般需要 3–8 秒</view>
+    </view>
+  </view>
+</view>

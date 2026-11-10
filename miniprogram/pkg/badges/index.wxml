@@ -1,0 +1,10 @@
+<view class="page">
+  <view class="muted small">慢慢收集，不着急</view>
+  <view class="grid mt">
+    <view wx:for="{{badges}}" wx:key="code" class="badge {{item.got ? '' : 'off'}}">
+      <view class="b-icon">{{item.icon}}</view>
+      <view class="small">{{item.name}}</view>
+      <view class="tiny muted">{{item.desc}}</view>
+    </view>
+  </view>
+</view>

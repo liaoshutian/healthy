@@ -1,0 +1,7 @@
+.current { background: var(--lime-soft); }
+.hint { background: #FFF9E0; border-radius: 20rpx; padding: 20rpx; }
+.plan-card { background: #fff; border-radius: 32rpx; padding: 32rpx; box-shadow: 0 6rpx 28rpx rgba(94, 158, 42, 0.08); border-top: 12rpx solid var(--pulp); }
+.p-icon { font-size: 80rpx; }
+.p-name { font-size: 36rpx; font-weight: 700; margin-top: 8rpx; }
+.stars { color: var(--lemon); font-size: 28rpx; }
+.rules { background: var(--cream); border-radius: 16rpx; padding: 16rpx 20rpx; }

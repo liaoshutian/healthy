@@ -1,0 +1,4 @@
+.search { background: #fff; border-radius: 999rpx; padding: 20rpx 32rpx; }
+.cats { white-space: nowrap; }
+.food { padding: 22rpx 0; border-bottom: 1rpx solid var(--line); }
+.add { color: var(--lime-deep); font-size: 40rpx; }

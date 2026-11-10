@@ -1,0 +1,26 @@
+<view class="page">
+  <view class="muted small">不用每天打卡，到时间了小柠提醒你</view>
+  <view wx:if="{{!list.length}}" class="card mt">
+    <view class="empty">还没有规律小事，从下面挑几件吧</view>
+  </view>
+  <view wx:for="{{list}}" wx:key="id" class="card r-card mt" data-id="{{item.id}}" bindtap="open">
+    <view class="r-icon">{{item.icon}}</view>
+    <view class="flex1">
+      <view class="r-name">{{item.name}}<text wx:if="{{item.state === 'overdue' || item.state === 'due'}}" class="tag yellow">到时间啦</text></view>
+      <view class="small muted">{{item.days_since !== null ? '距上次 ' + item.days_since + ' 天 / ' : ''}}周期 {{item.cycle_days}} 天</view>
+      <view class="tiny {{item.state === 'overdue' ? 'soft-orange' : 'muted'}}">{{item.text}}</view>
+    </view>
+    <view class="ring" style="background: conic-gradient(#7DBE3C {{item.progress * 360}}deg, #EDF0E2 0deg)">
+      <view class="ring-in">{{item.days_left >= 0 ? item.days_left : 0}}<text class="tiny">天</text></view>
+    </view>
+    <view class="done-btn" data-id="{{item.id}}" catchtap="done">完成</view>
+  </view>
+
+  <view class="card mt2">
+    <view class="card-title">挑一件加进来</view>
+    <view class="row wrap">
+      <view wx:for="{{templates}}" wx:key="name" class="chip" data-index="{{index}}" bindtap="addTemplate">{{item.icon}} {{item.name}} · {{item.cycle_days}}天</view>
+      <view class="chip on" bindtap="addCustom">＋ 自定义</view>
+    </view>
+  </view>
+</view>

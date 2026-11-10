@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>青柠生活 · 管理后台</title>
+<style>
+  :root { --lime:#7DBE3C; --ink:#2F3A24; --bg:#FFFDF6; --line:#E6EAD8; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:14px/1.6 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:var(--lime); color:#fff; padding:12px 16px; font-weight:600; }
+  main { max-width:960px; margin:0 auto; padding:16px; }
+  section { background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; }
+  h2 { font-size:16px; margin:0 0 12px; }
+  input, select, button { font:inherit; padding:6px 10px; border:1px solid var(--line); border-radius:8px; }
+  button { background:var(--lime); color:#fff; border:none; cursor:pointer; }
+  button.ghost { background:#fff; color:var(--ink); border:1px solid var(--line); }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  th, td { text-align:left; padding:6px; border-bottom:1px solid var(--line); }
+  pre { background:#F6F8EF; padding:10px; border-radius:8px; white-space:pre-wrap; word-break:break-all; }
+  .muted { color:#7a8470; }
+</style>
+</head>
+<body>
+<header>🍋 青柠生活 · 管理后台</header>
+<main>
+  <section>
+    <div class="row"><input id="token" type="password" placeholder="管理员口令 ADMIN_TOKEN" style="flex:1"><button onclick="saveToken()">保存</button></div>
+    <div id="stats" class="muted"></div>
+  </section>
+
+  <section>
+    <h2>生成兑换码</h2>
+    <div class="row">
+      <select id="tier"><option value="pro">Pro</option><option value="max">Max</option></select>
+      <input id="days" type="number" value="30" style="width:90px"> 天
+      <input id="count" type="number" value="10" style="width:90px"> 个
+      <input id="batch" placeholder="批次名，如 2026-11 星球">
+      <input id="before" type="date" title="兑换截止日（可空）">
+      <button onclick="gen()">生成</button>
+    </div>
+    <pre id="codes" class="muted">生成后在这里显示，可整段复制发到星球私信。</pre>
+  </section>
+
+  <section>
+    <h2>按会员 ID 开通 / 延期</h2>
+    <div class="row">
+      <input id="q" placeholder="会员 ID（如 QN000012）或昵称"><button class="ghost" onclick="findUser()">查找</button>
+    </div>
+    <table id="users"></table>
+  </section>
+
+  <section>
+    <h2>7 天内到期</h2>
+    <div class="row"><button class="ghost" onclick="expiring()">刷新</button><button class="ghost" onclick="dl('/api/admin/expiring?days=7&fmt=csv','expiring.csv')">导出 CSV</button></div>
+    <table id="exp"></table>
+  </section>
+
+  <section>
+    <h2>最近核销与开通记录</h2>
+    <table id="logs"></table>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+$('token').value = localStorage.getItem('qn_admin') || '';
+function saveToken() { localStorage.setItem('qn_admin', $('token').value); load(); }
+async function api(path, opts = {}) {
+  const r = await fetch(path, { ...opts, headers: { 'Content-Type': 'application/json', 'X-Admin-Token': $('token').value, ...(opts.headers || {}) } });
+  if (!r.ok) { const t = await r.text(); alert(r.status + ' ' + t); throw new Error(t); }
+  return r;
+}
+const fmt = (s) => s ? new Date(s).toLocaleString('zh-CN') : '';
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+// 用户填的内容（昵称等）一律转义；只有我们自己拼的操作按钮用 {html: ...} 原样插入
+const cell = (c) => (c && typeof c === 'object' && 'html' in c) ? c.html : esc(c);
+function table(el, head, rows) {
+  el.innerHTML = '<tr>' + head.map(h => `<th>${esc(h)}</th>`).join('') + '</tr>' + rows.map(r => '<tr>' + r.map(c => `<td>${cell(c)}</td>`).join('') + '</tr>').join('');
+}
+async function gen() {
+  const body = { tier: $('tier').value, days: +$('days').value, count: +$('count').value, batch: $('batch').value || null, redeem_before: $('before').value || null };
+  const d = await (await api('/api/admin/codes', { method: 'POST', body: JSON.stringify(body) })).json();
+  $('codes').textContent = d.codes.join('\n');
+}
+async function findUser() {
+  const d = await (await api('/api/admin/users?q=' + encodeURIComponent($('q').value))).json();
+  table($('users'), ['会员ID', '昵称', '档位', '到期', '操作'], d.map(u => [u.member_id, u.nickname, u.tier, fmt(u.end_at),
+    { html: `<button onclick="grant(${Number(u.id)},'pro',30)">+Pro 30天</button> <button onclick="grant(${Number(u.id)},'pro',365)">+Pro 1年</button> <button class="ghost" onclick="revoke(${Number(u.id)})">撤销</button>` }]));
+}
+async function grant(id, tier, days) { await api(`/api/admin/users/${id}/grant`, { method: 'POST', body: JSON.stringify({ tier, days }) }); findUser(); logs(); }
+async function revoke(id) { if (confirm('确定撤销？')) { await api(`/api/admin/users/${id}/revoke`, { method: 'POST' }); findUser(); logs(); } }
+async function expiring() {
+  const d = await (await api('/api/admin/expiring?days=7')).json();
+  table($('exp'), ['会员ID', '昵称', '档位', '到期'], d.map(x => [x.member_id, x.nickname, x.tier, fmt(x.end_at)]));
+}
+async function logs() {
+  const d = await (await api('/api/admin/logs?limit=50')).json();
+  const src = { trial: '试用', code: '兑换码', admin: '后台' };
+  table($('logs'), ['时间', '会员ID', '方式', '档位', '天数', '兑换码', '到期'], d.map(x => [fmt(x.created_at), x.member_id, src[x.source] || x.source, x.tier, x.days, x.code, fmt(x.end_at)]));
+}
+async function stats() {
+  const d = await (await api('/api/admin/stats')).json();
+  $('stats').textContent = `用户 ${d.users} · 有效会员 ${d.active_subscriptions} · 待审食物 ${d.pending_foods}`;
+}
+async function dl(path, name) {
+  const b = await (await api(path)).blob();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; a.click();
+}
+function load() { if ($('token').value) { stats(); expiring(); logs(); } }
+load();
+</script>
+</body>
+</html>

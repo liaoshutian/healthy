@@ -1,0 +1,11 @@
+.seg { display: flex; background: var(--line); border-radius: 999rpx; padding: 6rpx; margin-bottom: 24rpx; }
+.seg-item { flex: 1; text-align: center; padding: 12rpx 0; border-radius: 999rpx; color: var(--muted); }
+.seg-item.on { background: #fff; color: var(--lime-deep); font-weight: 600; }
+.frame { border: 4rpx dashed var(--pulp); border-radius: 32rpx; padding: 80rpx 40rpx; background: #fff; }
+.a4 { width: 240rpx; height: 340rpx; margin: 0 auto; border: 4rpx solid var(--lime); border-radius: 12rpx; line-height: 340rpx; color: var(--lime); font-size: 48rpx; }
+.weight-input { justify-content: center; margin-top: 24rpx; }
+.w { font-size: 96rpx; font-weight: 700; text-align: center; height: 140rpx; }
+.report { width: 100%; height: 400rpx; border-radius: 20rpx; background: #fff; margin-bottom: 20rpx; }
+.hint { background: #FFF6D6; border-radius: 16rpx; padding: 16rpx 20rpx; margin-bottom: 20rpx; }
+.unit { width: 80rpx; text-align: right; }
+.page { padding-bottom: 240rpx; }

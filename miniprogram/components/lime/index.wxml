@@ -1,0 +1,3 @@
+<view class="lime" style="width:{{size}}rpx;height:{{size}}rpx" bindtap="onTap">
+  <canvas type="2d" id="c" class="canvas" style="width:{{size}}rpx;height:{{size}}rpx"></canvas>
+</view>

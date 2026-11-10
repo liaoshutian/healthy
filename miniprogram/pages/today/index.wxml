@@ -1,0 +1,110 @@
+<view class="page">
+  <view class="between">
+    <view>
+      <view class="big">{{greeting}}</view>
+      <view class="muted small">{{dateText}}</view>
+    </view>
+    <view class="streak" wx:if="{{d.streak}}">
+      <view class="streak-num">{{d.streak.month_days}}</view>
+      <view class="tiny muted">本月记录天数</view>
+    </view>
+  </view>
+
+  <!-- 一片青柠：每记一类事点亮一瓣 -->
+  <view class="card lime-card">
+    <lime petals="{{d.petals}}" size="{{400}}" />
+    <view class="center mt">
+      <text wx:if="{{d.complete}}" class="lime-deep">今天很完整！小柠为你骄傲 🎉</text>
+      <text wx:else>今天点亮了 {{d.petals_lit || 0}}/{{d.petals_total || 6}} 瓣</text>
+    </view>
+    <view class="petal-row mt">
+      <view wx:for="{{d.petals}}" wx:key="key" class="petal-chip {{item.lit ? 'lit' : ''}}" data-key="{{item.key}}" bindtap="onPetal">
+        <text>{{item.icon}}</text><text class="tiny">{{item.label}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日饭量：生活里的参照物 -->
+  <view class="card">
+    <view class="card-title">今日饭量<text class="more" bindtap="toggleMacro">{{showMacro ? '收起' : '看克数'}}</text></view>
+    <view class="portion-row">
+      <view wx:for="{{d.food.icons}}" wx:key="key" class="portion {{item.count ? '' : 'empty-p'}}">
+        <view class="p-icon">{{item.icon}}</view>
+        <view class="tiny">{{item.count ? item.label : '还没有' }}</view>
+      </view>
+    </view>
+    <view class="muted small mt" wx:if="{{d.food.extra_rice_bowls}}">零食饮品约 {{d.food.extra_rice_bowls}} 碗饭</view>
+    <view class="muted tiny mt">约 {{d.food.kcal || 0}} 千卡（估算）</view>
+    <view wx:if="{{showMacro}}" class="macro mt small">碳水 {{d.food.carb}} g · 蛋白质 {{d.food.protein}} g · 脂肪 {{d.food.fat}} g</view>
+    <view wx:if="{{d.challenge}}" class="challenge mt">
+      <text>{{d.challenge.plan.icon}} {{d.challenge.plan.name}}挑战 第 {{d.challenge.day_n}}/{{d.challenge.days}} 天</text>
+      <text class="small"> · 今天点亮 {{d.challenge_today.lit_meals}}/{{d.challenge_today.goal}} 顿{{d.challenge_today.done ? '，今日达成 ✨' : ''}}</text>
+    </view>
+  </view>
+
+  <!-- 今日饮食 -->
+  <view class="card">
+    <view class="card-title">今日饮食</view>
+    <view wx:for="{{d.meals}}" wx:key="type" class="meal-row">
+      <view class="meal-label">{{item.label}}</view>
+      <view class="flex1">
+        <view wx:if="{{item.logs.length}}">
+          <view wx:for="{{item.logs}}" wx:for-item="log" wx:key="id" class="meal-log" data-id="{{log.id}}" bindtap="openMeal">
+            <view class="ellipsis">{{log.title}}</view>
+            <view class="tiny muted">{{log.summary}}<text wx:if="{{log.plan_lit}}" class="tag">已点亮</text></view>
+          </view>
+        </view>
+        <view wx:else class="muted small" data-type="{{item.type}}" bindtap="snapMeal">＋ 拍一下</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 进行中的不适 -->
+  <block wx:for="{{d.symptoms}}" wx:key="id">
+    <view class="card" wx:if="{{!item.checked_today}}">
+      <view class="between" data-id="{{item.id}}" bindtap="openSymptom">
+        <view>
+          <view>今天好些了吗？</view>
+          <view class="small muted">{{item.title}}</view>
+        </view>
+        <view class="btn small ghost">记一下</view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 规律提醒 -->
+  <view class="card" wx:if="{{d.routines.length}}">
+    <view class="card-title">规律小事<text class="more" bindtap="goRoutines">全部 ›</text></view>
+    <scroll-view scroll-x class="routine-scroll">
+      <view wx:for="{{d.routines}}" wx:key="id" class="routine-card {{item.state}}">
+        <view class="r-icon">{{item.icon}}</view>
+        <view class="small">{{item.name}}</view>
+        <view class="tiny muted">{{item.text}}</view>
+        <view class="btn small ghost mt" data-id="{{item.id}}" bindtap="doneRoutine">完成了</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 身体快照 -->
+  <view class="card" bindtap="goBody">
+    <view class="card-title">身体快照<text class="more">记录 ›</text></view>
+    <view wx:if="{{d.body}}" class="row">
+      <view class="flex1 center">
+        <view class="big">{{d.body.weight_kg || '-'}}</view>
+        <view class="tiny muted">体重 kg <text wx:if="{{d.body.delta.weight_kg}}">{{d.body.delta.weight_kg > 0 ? '↑' : '↓'}}{{d.body.delta.weight_kg}}</text></view>
+      </view>
+      <view class="flex1 center">
+        <view class="big">{{d.body.body_fat_pct || '-'}}</view>
+        <view class="tiny muted">体脂率 %</view>
+      </view>
+      <view class="flex1 center">
+        <view class="big">{{d.body.skeletal_muscle_kg || '-'}}</view>
+        <view class="tiny muted">骨骼肌 kg</view>
+      </view>
+    </view>
+    <view wx:else class="muted small">还没有身体数据，拍一张 InBody 报告或者称一下体重吧</view>
+    <view wx:if="{{d.body.inbody_hint}}" class="tiny soft-orange mt">{{d.body.inbody_hint}}</view>
+  </view>
+
+  <view wx:if="{{recommend}}" class="card hint" bindtap="goPlans">💡 {{recommend.text}}</view>
+</view>

@@ -1,0 +1,2 @@
+.photo { width: 100%; height: 300rpx; border-radius: 16rpx; }
+.page { padding-bottom: 240rpx; }

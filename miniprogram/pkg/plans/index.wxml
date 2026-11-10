@@ -1,0 +1,38 @@
+<view class="page">
+  <view class="muted small">把喜欢的饮食方案当成一张卡来玩。可以先试玩 3 天，随时暂停或换卡，不算失败。</view>
+
+  <view wx:if="{{current}}" class="card current mt">
+    <view class="between">
+      <view>
+        <view class="small muted">正在玩</view>
+        <view class="big">{{current.plan.icon}} {{current.plan.name}}</view>
+        <view class="small">第 {{current.day_n}}/{{current.days}} 天{{current.is_trial ? '（试玩）' : ''}}{{current.status === 'paused' ? ' · 暂停中' : ''}}</view>
+      </view>
+      <view>
+        <view wx:if="{{current.status === 'active'}}" class="btn small ghost" data-action="pause" bindtap="act">暂停</view>
+        <view wx:else class="btn small ghost" data-action="resume" bindtap="act">继续</view>
+        <view class="tiny muted center mt" data-action="stop" bindtap="act">不玩了</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{recommend}}" class="hint small mt">💡 {{recommend.text}}</view>
+
+  <view wx:for="{{plans}}" wx:key="code" class="plan-card mt">
+    <view class="between">
+      <view class="p-icon">{{item.icon}}</view>
+      <view class="stars">{{item.stars}}</view>
+    </view>
+    <view class="p-name">{{item.name}}</view>
+    <view class="small muted">{{item.tagline}}</view>
+    <view class="rules mt">
+      <view wx:for="{{item.how_to_play}}" wx:for-item="rule" wx:key="*this" class="small">· {{rule}}</view>
+    </view>
+    <view class="tiny muted mt">每顿符合玩法就点亮{{item.lit_icon_name}}，一天点亮 2 顿算今日达成</view>
+    <view wx:if="{{item.caution}}" class="tiny soft-orange mt">⚠️ {{item.caution}}</view>
+    <view class="row gap mt">
+      <view class="btn ghost flex1" data-code="{{item.code}}" data-trial="1" bindtap="start">试玩 3 天</view>
+      <view class="btn flex1" data-code="{{item.code}}" bindtap="start">玩 {{item.suggested_days}} 天</view>
+    </view>
+  </view>
+</view>
