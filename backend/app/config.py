@@ -34,7 +34,10 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     # 不直连 OpenAI，必须填自己服务器上的中转地址（OpenAI 兼容接口，如 https://relay.example.com/v1）；留空则不调用 ChatGPT
     openai_base_url: str = ""
-    openai_vision_model: str = "gpt-4.1"
+    openai_vision_model: str = "gpt-6.1-terra"
+    openai_text_model: str = "gpt-6.1-terra"  # DeepSeek 失败时的文字兜底
+    # 推理强度：GPT-5 及以后的模型用（none/low/medium/high）；留空则按老模型传 temperature
+    openai_reasoning_effort: str = "low"
     qwen_api_key: str = ""
     qwen_base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     qwen_vision_model: str = "qwen-vl-max"

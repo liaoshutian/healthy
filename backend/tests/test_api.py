@@ -320,3 +320,22 @@ def test_unlimited_tier_still_has_hard_cap():
     for _ in range(quota.HARD_CAP["day"]):
         assert quota.try_consume("food", 1, "max", date(2026, 1, 1))
     assert not quota.try_consume("food", 1, "max", date(2026, 1, 1))
+
+
+def test_reasoning_models_skip_temperature(monkeypatch):
+    """GPT-5 以后的推理模型不接受 temperature，只传 reasoning_effort；老模型留空时照旧传 temperature。"""
+    import httpx
+
+    from app.services.ai.client import Provider, chat_json
+
+    bodies = []
+
+    def fake_post(url, headers, json, timeout):
+        bodies.append(json)
+        return httpx.Response(200, json={"choices": [{"message": {"content": '{"ok": 1}'}}]})
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    chat_json(Provider("openai", "https://relay.test/v1", "k", "gpt-6.1-terra", True, "low"), "s", "u")
+    chat_json(Provider("openai", "https://relay.test/v1", "k", "gpt-4.1", True), "s", "u")
+    assert bodies[0]["reasoning_effort"] == "low" and "temperature" not in bodies[0]
+    assert bodies[1]["temperature"] == 0.1 and "reasoning_effort" not in bodies[1]
