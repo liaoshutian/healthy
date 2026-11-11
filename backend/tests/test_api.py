@@ -359,8 +359,9 @@ def test_medication_reminder_uses_routine_template(client, auth, monkeypatch):
     with SessionLocal() as db:
         assert worker.medication_reminders(db) == 1
     _, tmpl, _, data = sent[0]
-    assert tmpl == "TMPL_X" and set(data) == {"date2", "thing3"}
-    assert data["thing3"].startswith("吃药：布洛芬") and len(data["thing3"]) <= 20
+    assert tmpl == "TMPL_X" and set(data) == {"thing1", "thing9", "date2", "thing4"}
+    assert data["thing1"] == "布洛芬缓释胶囊" and data["thing9"] == "吃药"
+    assert data["thing4"] == "今天记得吃，每次1 粒" and all(len(data[k]) <= 20 for k in ("thing1", "thing9", "thing4"))
     assert data["date2"].endswith(" 09:00")
 
 
