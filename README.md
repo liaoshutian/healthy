@@ -1,6 +1,6 @@
-# 青柠生活
+# 吃饱睡好簿
 
-“拍一下就记好”的个人健康记录微信小程序：饮食、体成分、规律生活、身体不适四条线，用一片青柠串起每一天。
+“拍一下就记好”的个人健康记录微信小程序（原名“青柠生活”，因重名改名，视觉仍是青柠绿和吉祥物小柠）：饮食、体成分、规律生活、身体不适四条线，用一片青柠串起每一天。
 方案文档见项目内的《交互与产品方案 v0.1》。
 
 ```
@@ -44,11 +44,13 @@ pytest -q                            # 24 个测试；设 TEST_DATABASE_URL 可�
 
 ## 部署到 Lighthouse
 
+完整的上线步骤（Lighthouse、公众平台配置、上传提审发布、上线自查）见 [docs/DEPLOY.md](docs/DEPLOY.md)。下面是后端部分的速记：
+
 ```bash
 git clone https://github.com/liaoshutian/healthy /opt/healthy
 cd /opt/healthy/deploy
 cp .env.example .env    # 填密码、AppSecret、OpenAI 中转地址、各家模型 key
-mkdir certs             # 放 api.rexliao.cn 的 Nginx 证书（腾讯云免费 SSL 证书即可）
+mkdir certs             # 放 healthy.rexliao.cn 的 Nginx 证书（腾讯云免费 SSL 证书即可）
 docker compose up -d --build
 crontab -e              # 加一行：30 3 * * * cd /opt/healthy/deploy && mkdir -p backups && ./backup.sh >> backups/backup.log 2>&1
 ```
@@ -70,10 +72,10 @@ API 容器启动时会自动跑数据库迁移，并把首发食物库（94 条�
 
 ## 上线前需要 Rex 准备的
 
-1. **域名**：`api.rexliao.cn` 解析到 Lighthouse，并确认 `rexliao.cn` 的 ICP 备案已完成。
-2. **小程序后台 → 开发管理 → 服务器域名**：request、uploadFile、downloadFile 合法域名都填 `https://api.rexliao.cn`。
+1. **域名**：`healthy.rexliao.cn` 解析到 Lighthouse，并确认 `rexliao.cn` 的 ICP 备案已完成。
+2. **小程序后台 → 开发管理 → 服务器域名**：request、uploadFile、downloadFile 合法域名都填 `https://healthy.rexliao.cn`。
 3. **小程序后台 → 设置 → 用户隐私保护指引**：声明相机、相册、头像、日历；不填的话这些接口调不了。
-4. **订阅消息模板**：已选好“日程提醒”（编号 46076，字段 time1 日程时间 + thing2 备注），规律小事和吃药提醒共用，ID 已写进 `deploy/.env.example` 的 `WX_TMPL_ROUTINE` 和 `miniprogram/utils/config.ts`。换模板时两处一起改，并对一下 `backend/app/worker.py` 里 `reminder_data` 的字段名。
+4. **订阅消息模板**：已选好“日程提醒”（健康管理类目，编号 5666，字段 thing1 日程主题、thing9 日程类型、date2 日程时间、thing4 温馨提示），规律小事和吃药提醒共用，ID 已写进 `deploy/.env.example` 的 `WX_TMPL_ROUTINE` 和 `miniprogram/utils/config.ts`。换模板时两处一起改，并对一下 `backend/app/worker.py` 里 `reminder_data` 的字段名。
 5. **AppSecret、OpenAI / 通义千问 / DeepSeek 的 key**。
 6. **OpenAI 中转**：后端不直连 `api.openai.com`，在 `OPENAI_BASE_URL` 填我们自己服务器上的中转地址（OpenAI 兼容接口，形如 `https://xxx/v1`）。没填或中转不通时自动用通义千问 VL。
 7. 食物库份量换算和挑战卡参数是初稿，建议找营养师审一遍（`backend/app/data/foods.py`、`backend/app/services/plans.py`）。

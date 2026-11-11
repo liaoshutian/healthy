@@ -1,4 +1,4 @@
-# 青柠生活后端：所有服务都跑在一台腾讯云 Lighthouse 上，数据（数据库、图片）都在本机 ./data 目录。
+# 吃饱睡好簿后端：所有服务都跑在一台腾讯云 Lighthouse 上，数据（数据库、图片）都在本机 ./data 目录。
 # 用法：cp .env.example .env 并填好 → docker compose up -d --build
 services:
   api:

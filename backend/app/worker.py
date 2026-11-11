@@ -19,9 +19,15 @@ log = logging.getLogger("worker")
 SEND_HOURS = range(9, 21)  # 只在白天发
 
 
-def reminder_data(day, note: str) -> dict[str, str]:
-    """“日程提醒”模板（编号 46076）：time1=日程时间，thing2=备注（最多 20 字）。规律小事和吃药提醒共用。"""
-    return {"time1": f"{day.year}年{day.month}月{day.day}日 09:00", "thing2": note[:20]}
+def reminder_data(day, topic: str, kind: str, tip: str) -> dict[str, str]:
+    """“日程提醒”模板（健康管理类目，编号 5666）：thing1=日程主题，thing9=日程类型，date2=日程时间，thing4=温馨提示。
+    thing 类字段最多 20 字。规律小事和吃药提醒共用。"""
+    return {
+        "thing1": topic[:20],
+        "thing9": kind[:20],
+        "date2": f"{day.year}年{day.month}月{day.day}日 09:00",
+        "thing4": tip[:20],
+    }
 
 
 def routine_reminders(db) -> int:
@@ -38,7 +44,7 @@ def routine_reminders(db) -> int:
         days_left = (due - today).days
         tip = "今天就是计划的日子" if days_left == 0 else (f"还有 {days_left} 天" if days_left > 0 else "已经到时间啦")
         ok = send_subscribe_message(u.openid, s.wx_tmpl_routine, f"pages/routine/index?id={r.id}",
-                                    reminder_data(due, f"{r.name}：{tip}"))
+                                    reminder_data(due, r.name, "规律小事", tip))
         r.last_reminded_for = due
         r.reminder_credits = max(0, r.reminder_credits - 1)
         sent += int(ok)
@@ -60,9 +66,9 @@ def medication_reminders(db) -> int:
         # 每天只在 9 点那一轮发一条
         if clock.now().hour != 9:
             continue
-        dose = f" 每次{m.dose}" if m.dose else ""
+        tip = f"今天记得吃，每次{m.dose}" if m.dose else "今天记得按时吃"
         ok = send_subscribe_message(u.openid, s.wx_tmpl_routine, "pages/record/index",
-                                    reminder_data(today, f"吃药：{m.name}{dose}"))
+                                    reminder_data(today, m.name, "吃药", tip))
         m.reminder_credits = max(0, m.reminder_credits - 1)
         sent += int(ok)
     db.commit()

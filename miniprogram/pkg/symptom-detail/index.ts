@@ -168,7 +168,7 @@ Page({
           ctx.fillText(sum.title, 20, 46)
           ctx.font = '12px sans-serif'
           ctx.fillStyle = '#8A9479'
-          ctx.fillText('青柠生活 · ' + new Date(sum.generated_at).toLocaleDateString(), 20, 70)
+          ctx.fillText('吃饱睡好簿 · ' + new Date(sum.generated_at).toLocaleDateString(), 20, 70)
           ctx.fillStyle = '#2F3A24'
           ctx.font = '15px sans-serif'
           lines.forEach((l, i) => ctx.fillText(l, 20, 110 + i * lineH))

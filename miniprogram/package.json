@@ -1,8 +1,8 @@
 {
   "name": "qingning-miniprogram",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "青柠生活 微信小程序（原生 + TypeScript）",
+  "description": "吃饱睡好簿 微信小程序（原生 + TypeScript）",
   "scripts": {
     "typecheck": "tsc --noEmit -p ."
   },

@@ -67,7 +67,7 @@ Page({
     const start = new Date(base.getTime() + b.cycle_days * 86400000)
     start.setHours(10, 0, 0, 0)
     const startTime = Math.floor(start.getTime() / 1000)
-    const title = `${b.icon} ${b.name}（青柠生活）`
+    const title = `${b.icon} ${b.name}（吃饱睡好簿）`
     const done = {
       success: () => wx.showToast({ title: '已写进手机日历', icon: 'none' }),
       fail: () => wx.showToast({ title: '没写进去，检查一下日历权限', icon: 'none' }),
