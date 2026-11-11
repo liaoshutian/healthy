@@ -1,6 +1,6 @@
-# 青柠生活
+# 吃饱睡好簿
 
-“拍一下就记好”的个人健康记录微信小程序：饮食、体成分、规律生活、身体不适四条线，用一片青柠串起每一天。
+“拍一下就记好”的个人健康记录微信小程序（原名“青柠生活”，因重名改名，视觉仍是青柠绿和吉祥物小柠）：饮食、体成分、规律生活、身体不适四条线，用一片青柠串起每一天。
 方案文档见项目内的《交互与产品方案 v0.1》。
 
 ```
@@ -43,6 +43,8 @@ pytest -q                            # 24 个测试；设 TEST_DATABASE_URL 可�
 类型检查：`cd miniprogram && npm install && npm run typecheck`。
 
 ## 部署到 Lighthouse
+
+完整的上线步骤（Lighthouse、公众平台配置、上传提审发布、上线自查）见 [docs/DEPLOY.md](docs/DEPLOY.md)。下面是后端部分的速记：
 
 ```bash
 git clone https://github.com/liaoshutian/healthy /opt/healthy

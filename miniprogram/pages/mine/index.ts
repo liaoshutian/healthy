@@ -67,7 +67,7 @@ Page({
         wx.hideLoading()
         if (r.statusCode !== 200) return showError({ status: r.statusCode, message: '导出失败' })
         // 小程序里不能直接存 zip 到相册，转发到聊天里再在电脑上打开
-        wx.shareFileMessage({ filePath: r.tempFilePath, fileName: '青柠生活数据.zip', fail: () => wx.showToast({ title: '已取消', icon: 'none' }) })
+        wx.shareFileMessage({ filePath: r.tempFilePath, fileName: '吃饱睡好簿数据.zip', fail: () => wx.showToast({ title: '已取消', icon: 'none' }) })
       },
       fail: () => {
         wx.hideLoading()
