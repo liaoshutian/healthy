@@ -45,5 +45,6 @@ def test_kcal_roughly_matches_macros():
 def test_common_home_dishes_match():
     foods = [SimpleNamespace(name=n, aliases=a) for n, a, *_ in FOODS]
     for q, want in [("韭黄炒蛋", "韭黄炒蛋"), ("韭黄炒鸡蛋", "韭黄炒蛋"), ("西红柿炒鸡蛋", "番茄炒蛋"),
-                    ("酸辣土豆丝", "炒土豆丝"), ("一碗螺蛳粉", "螺蛳粉"), ("清炒上海青", "炒青菜")]:
+                    ("酸辣土豆丝", "炒土豆丝"), ("凉拌腐竹", "凉拌腐竹"), ("煮红豆", "煮红豆"),
+                    ("一碗螺蛳粉", "螺蛳粉"), ("清炒上海青", "炒青菜")]:
         assert nutrition.match(foods, q).name == want, q
