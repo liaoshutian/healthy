@@ -75,7 +75,7 @@ API 容器启动时会自动跑数据库迁移，并把首发食物库（94 条�
 1. **域名**：`healthy.rexliao.cn` 解析到 Lighthouse，并确认 `rexliao.cn` 的 ICP 备案已完成。
 2. **小程序后台 → 开发管理 → 服务器域名**：request、uploadFile、downloadFile 合法域名都填 `https://healthy.rexliao.cn`。
 3. **小程序后台 → 设置 → 用户隐私保护指引**：声明相机、相册、头像、日历；不填的话这些接口调不了。
-4. **订阅消息模板**：已选好“日程提醒”（编号 46076，字段 time1 日程时间 + thing2 备注），规律小事和吃药提醒共用，ID 已写进 `deploy/.env.example` 的 `WX_TMPL_ROUTINE` 和 `miniprogram/utils/config.ts`。换模板时两处一起改，并对一下 `backend/app/worker.py` 里 `reminder_data` 的字段名。
+4. **订阅消息模板**：已选好“日程提醒”（健康管理类目，编号 5666，字段 date2 日程时间 + thing3 日程描述），规律小事和吃药提醒共用，ID 已写进 `deploy/.env.example` 的 `WX_TMPL_ROUTINE` 和 `miniprogram/utils/config.ts`。换模板时两处一起改，并对一下 `backend/app/worker.py` 里 `reminder_data` 的字段名。
 5. **AppSecret、OpenAI / 通义千问 / DeepSeek 的 key**。
 6. **OpenAI 中转**：后端不直连 `api.openai.com`，在 `OPENAI_BASE_URL` 填我们自己服务器上的中转地址（OpenAI 兼容接口，形如 `https://xxx/v1`）。没填或中转不通时自动用通义千问 VL。
 7. 食物库份量换算和挑战卡参数是初稿，建议找营养师审一遍（`backend/app/data/foods.py`、`backend/app/services/plans.py`）。

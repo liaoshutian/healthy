@@ -5,4 +5,4 @@ export const API_BASE =
   miniProgram.envVersion === 'develop' ? 'http://localhost:8000' : 'https://healthy.rexliao.cn'
 
 // 订阅消息模板 ID，和后端 WX_TMPL_ROUTINE 保持一致（在小程序后台申请后填写）；规律小事和吃药提醒共用
-export const TMPL_ROUTINE = 'neMAvVxEK1crzbttU9OOFdmTbRNXJXwZCUOGBU0vaos'
+export const TMPL_ROUTINE = '8akTTJ_oNg4R7rzgJbznrbLK_pLAFdt9LiDr-kVfoeY'

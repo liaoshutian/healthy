@@ -20,8 +20,8 @@ SEND_HOURS = range(9, 21)  # 只在白天发
 
 
 def reminder_data(day, note: str) -> dict[str, str]:
-    """“日程提醒”模板（编号 46076）：time1=日程时间，thing2=备注（最多 20 字）。规律小事和吃药提醒共用。"""
-    return {"time1": f"{day.year}年{day.month}月{day.day}日 09:00", "thing2": note[:20]}
+    """“日程提醒”模板（健康管理类目，编号 5666）：date2=日程时间，thing3=日程描述（最多 20 字）。规律小事和吃药提醒共用。"""
+    return {"date2": f"{day.year}年{day.month}月{day.day}日 09:00", "thing3": note[:20]}
 
 
 def routine_reminders(db) -> int:

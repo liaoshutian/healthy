@@ -359,9 +359,9 @@ def test_medication_reminder_uses_routine_template(client, auth, monkeypatch):
     with SessionLocal() as db:
         assert worker.medication_reminders(db) == 1
     _, tmpl, _, data = sent[0]
-    assert tmpl == "TMPL_X" and set(data) == {"time1", "thing2"}
-    assert data["thing2"].startswith("吃药：布洛芬") and len(data["thing2"]) <= 20
-    assert data["time1"].endswith(" 09:00")
+    assert tmpl == "TMPL_X" and set(data) == {"date2", "thing3"}
+    assert data["thing3"].startswith("吃药：布洛芬") and len(data["thing3"]) <= 20
+    assert data["date2"].endswith(" 09:00")
 
 
 def test_text_uses_openai_first_then_deepseek(client, auth, fake_ai, monkeypatch):
